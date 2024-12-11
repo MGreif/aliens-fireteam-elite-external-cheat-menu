@@ -7,9 +7,63 @@
 
 //////////////////////// Weapons
 
-//// SMG
 
-LPVOID SMGMagazinePointerchain[] = {
+//// Primary
+
+
+LPVOID primaryMagazinePointerchain[] = {
+    (LPVOID)0x050C9BF8,
+    (LPVOID)0x148,
+    (LPVOID)0x0,
+    (LPVOID)0xA8,
+    (LPVOID)0xA8,
+    (LPVOID)0x7DC,
+};
+
+/*
+LPVOID primaryMagazinePointerchain[] = {
+    (LPVOID)0x050CB010,
+    (LPVOID)0x100,
+    (LPVOID)0x20,
+    (LPVOID)0x138,
+    (LPVOID)0x60,
+    (LPVOID)0x70,
+    (LPVOID)0x3B0,
+    (LPVOID)0x7DC,
+};
+*/
+UINT8 primaryMagazinePointerchainSize = 6;
+
+
+LPVOID primaryTotalAmmoPointerchain[] = {
+    (LPVOID)0x050CC278,
+    (LPVOID)0x28,
+    (LPVOID)0x8,
+    (LPVOID)0x170,
+    (LPVOID)0xB8,
+    (LPVOID)0x120,
+    (LPVOID)0x0,
+    (LPVOID)0x7D4
+};
+
+/*
+LPVOID RifleTotalAmmoPointerchain[] = {
+    (LPVOID)0x050CB010,
+    (LPVOID)0x100,
+    (LPVOID)0x20,
+    (LPVOID)0x138,
+    (LPVOID)0x60,
+    (LPVOID)0x70,
+    (LPVOID)0x3B0,
+    (LPVOID)0x7D4
+};
+*/
+UINT8 primaryTotalAmmoPointerchainSize = 8;
+
+
+//// Secondary
+
+LPVOID secondaryMagazinePointerchain[] = {
     (LPVOID)0x050C9B80,
     (LPVOID)0x210,
     (LPVOID)0x868,
@@ -21,7 +75,7 @@ LPVOID SMGMagazinePointerchain[] = {
 };
 
 /*
-LPVOID SMGMagazinePointerchain[] = {
+LPVOID secondaryMagazinePointerchain[] = {
     (LPVOID)0x050CB370,
     (LPVOID)0xB0,
     (LPVOID)0x20,
@@ -32,10 +86,10 @@ LPVOID SMGMagazinePointerchain[] = {
     (LPVOID)0x7DC,
 };
 */
-UINT8 SMGMagazinePointerchainSize = 8;
+UINT8 secondaryMagazinePointerchainSize = 8;
 
 
-LPVOID SMGTotalAmmoPointerchain[] = {
+LPVOID secondaryTotalAmmoPointerchain[] = {
     (LPVOID)0x0524F208,
     (LPVOID)0x18,
     (LPVOID)0x110,
@@ -47,7 +101,7 @@ LPVOID SMGTotalAmmoPointerchain[] = {
 };
 
 /*
-LPVOID SMGTotalAmmoPointerchain[] = {
+LPVOID secondaryTotalAmmoPointerchain[] = {
     (LPVOID)0x050CB370,
     (LPVOID)0xB0,
     (LPVOID)0x20,
@@ -58,10 +112,10 @@ LPVOID SMGTotalAmmoPointerchain[] = {
     (LPVOID)0x7D4,
 };
 */
-UINT8 SMGTotalAmmoPointerchainSize = 8;
+UINT8 secondaryTotalAmmoPointerchainSize = 8;
 
 
-LPVOID SMGSpreadPointerchain[] = {
+LPVOID secondarySpreadPointerchain[] = {
     (LPVOID)0x0524F208,
     (LPVOID)0x18,
     (LPVOID)0x110,
@@ -74,62 +128,11 @@ LPVOID SMGSpreadPointerchain[] = {
 
 
 
-UINT8 SMGSpreadPointerchainSize = 8;
+UINT8 secondarySpreadPointerchainSize = 8;
 
 
-//// Rifle
 
-
-LPVOID RifleMagazinePointerchain[] = {
-    (LPVOID)0x050C9BF8,
-    (LPVOID)0x148,
-    (LPVOID)0x0,
-    (LPVOID)0xA8,
-    (LPVOID)0xA8,
-    (LPVOID)0x7DC,
-};
-
-/*
-LPVOID RifleMagazinePointerchain[] = {
-    (LPVOID)0x050CB010,
-    (LPVOID)0x100,
-    (LPVOID)0x20,
-    (LPVOID)0x138,
-    (LPVOID)0x60,
-    (LPVOID)0x70,
-    (LPVOID)0x3B0,
-    (LPVOID)0x7DC,
-};
-*/
-UINT8 RifleMagazinePointerchainSize = 6;
-
-
-LPVOID RifleTotalAmmoPointerchain[] = {
-    (LPVOID)0x050CC278,
-    (LPVOID)0x28,
-    (LPVOID)0x8,
-    (LPVOID)0x170,
-    (LPVOID)0xB8,
-    (LPVOID)0x120,
-    (LPVOID)0x0,
-    (LPVOID)0x7D4
-};
-
-/*
-LPVOID RifleTotalAmmoPointerchain[] = {
-    (LPVOID)0x050CB010,
-    (LPVOID)0x100,
-    (LPVOID)0x20,
-    (LPVOID)0x138,
-    (LPVOID)0x60,
-    (LPVOID)0x70,
-    (LPVOID)0x3B0,
-    (LPVOID)0x7D4
-};
-*/
-UINT8 RifleTotalAmmoPointerchainSize = 8;
-
-LPVOID rifleSpreadPointerchain[] = {
+LPVOID primarySpreadPointerchain[] = {
     (LPVOID)0x050CC278,
     (LPVOID)0x28,
     (LPVOID)0x8,
@@ -140,7 +143,7 @@ LPVOID rifleSpreadPointerchain[] = {
     (LPVOID)0x7E8,
 };
 
-UINT8 rifleSpreadPointerchainSize = 8;
+UINT8 primarySpreadPointerchainSize = 8;
 
 
 

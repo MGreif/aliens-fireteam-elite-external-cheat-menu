@@ -36,7 +36,7 @@ BOOL removeWeaponSpray(HANDLE hProcess, LPVOID baseAddress) {
 
 
     char buffer[] = { 0x0, 0x0, 0x0, 0x0 }; // 4 Byte
-    if (!writeMemory(hProcess, baseAddress, rifleSpreadPointerchain, rifleSpreadPointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, secondarySpreadPointerchain, secondarySpreadPointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
@@ -44,7 +44,7 @@ BOOL removeWeaponSpray(HANDLE hProcess, LPVOID baseAddress) {
         std::cout << "Set spread to 0" << std::endl;
     }
 
-    if (!writeMemory(hProcess, baseAddress, SMGSpreadPointerchain, SMGMagazinePointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, primarySpreadPointerchain, primarySpreadPointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
@@ -174,20 +174,20 @@ BOOL removeStaminaStarvation(HANDLE hProcess, LPVOID baseAddress) {
 }
 
 
-BOOL setSMGMagazine(HANDLE hProcess, LPVOID baseAddress) {
+BOOL setPrimaryMagazine(HANDLE hProcess, LPVOID baseAddress) {
     std::cout << "Setting current magazine ammo to 9999 (0x270F)" << std::endl;
     char buffer[] = { 0x0F, 0x27 };
-    if (!writeMemory(hProcess, baseAddress, SMGMagazinePointerchain, SMGMagazinePointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, primaryMagazinePointerchain, primaryMagazinePointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
     return 0;
 }
 
-BOOL setSMGTotal(HANDLE hProcess, LPVOID baseAddress) {
+BOOL setPrimaryTotal(HANDLE hProcess, LPVOID baseAddress) {
     std::cout << "Setting total ammo for current weapon to 9999 (0x270F)" << std::endl;
     char buffer[] = { 0x0F, 0x27 };
-    if (!writeMemory(hProcess, baseAddress, SMGTotalAmmoPointerchain, SMGTotalAmmoPointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, primaryTotalAmmoPointerchain, primaryTotalAmmoPointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
@@ -196,20 +196,20 @@ BOOL setSMGTotal(HANDLE hProcess, LPVOID baseAddress) {
 
 
 
-BOOL setRifleMagazine(HANDLE hProcess, LPVOID baseAddress) {
+BOOL setSecondaryMagazine(HANDLE hProcess, LPVOID baseAddress) {
     std::cout << "Setting current magazine ammo to 9999 (0x270F)" << std::endl;
     char buffer[] = { 0x0F, 0x27 };
-    if (!writeMemory(hProcess, baseAddress, RifleMagazinePointerchain, RifleMagazinePointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, secondaryMagazinePointerchain, secondaryMagazinePointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
     return 0;
 }
 
-BOOL setRifleTotal(HANDLE hProcess, LPVOID baseAddress) {
+BOOL setSecondaryTotal(HANDLE hProcess, LPVOID baseAddress) {
     std::cout << "Setting total ammo for current weapon to 9999 (0x270F)" << std::endl;
     char buffer[] = { 0x0F, 0x27 };
-    if (!writeMemory(hProcess, baseAddress, RifleTotalAmmoPointerchain, RifleTotalAmmoPointerchainSize, buffer, sizeof(buffer))) {
+    if (!writeMemory(hProcess, baseAddress, secondaryTotalAmmoPointerchain, secondaryTotalAmmoPointerchainSize, buffer, sizeof(buffer))) {
         std::cout << "Could not patch memory ...";
         return 1;
     }
@@ -264,22 +264,23 @@ int main(int argc, char** argv)
         fflush(stdin);
 
         if (strncmp(buffer, "1",1) == 0) {
-            if (setSMGMagazine(hProcess, (LPVOID)baseAddress) > 0) {
+            if (setPrimaryMagazine(hProcess, (LPVOID)baseAddress) > 0) {
                 std::cout << GetLastError() << std::endl;
                 return 1;
             }
-            if (setSMGTotal(hProcess, (LPVOID)baseAddress) > 0) {
+            if (setPrimaryTotal(hProcess, (LPVOID)baseAddress) > 0) {
                 std::cout << GetLastError() << std::endl;
                 return 1;
             }
-            if (setRifleMagazine(hProcess, (LPVOID)baseAddress) > 0) {
+            if (setSecondaryMagazine(hProcess, (LPVOID)baseAddress) > 0) {
                 std::cout << GetLastError() << std::endl;
                 return 1;
             }
-            if (setRifleTotal(hProcess, (LPVOID)baseAddress) > 0) {
+            if (setSecondaryTotal(hProcess, (LPVOID)baseAddress) > 0) {
                 std::cout << GetLastError() << std::endl;
                 return 1;
             }
+
         }
         else if (strncmp(buffer, "2", 1) == 0) {
             if (removeWeaponSpray(hProcess, (LPVOID)baseAddress) > 0) {
