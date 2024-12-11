@@ -1,6 +1,7 @@
 # Aliens: Fireteam Elite external cheat menu
 
 Architecture: x86_64
+
 OS: Windows
 
 ### Disclaimer
@@ -9,13 +10,13 @@ AFE is an amazing game and please use this menu with caution. Do not annoy or di
 
 ### Info
 I have not tested the offsets in an online lobby. I only tried them in a self-hosted bot lobby.
-This project is also fore the sole purpose of me learning CPP, WinAPI and GameHacking in general.
+This project is also for the sole purpose of me learning CPP, WinAPI and GameHacking in general.
 This means, that the CPP code is not perfect and i will try to improve it.
 
 #### Online with other players
 
 If you apply no-spread, it will also affect you in an online session with other players.
-The ammo seems to be broken a bit. You can set it to 9999 but after the actual ammo is empty, you will not do any damage to others.
+The ammo seems to be broken a bit. You can set it to 9999 but after the actual ammo is empty, you will not do any damage to others. You must not reload tho.
 
 
 ## Features
