@@ -61,6 +61,52 @@ LPVOID RifleTotalAmmoPointerchain[] = {
 UINT8 primaryTotalAmmoPointerchainSize = 8;
 
 
+LPVOID primarySpreadPointerchain[] = {
+    (LPVOID)0x050CC278,
+    (LPVOID)0x28,
+    (LPVOID)0x8,
+    (LPVOID)0x170,
+    (LPVOID)0xB8,
+    (LPVOID)0x120,
+    (LPVOID)0x0,
+    (LPVOID)0x7E8,
+};
+
+UINT8 primarySpreadPointerchainSize = 8;
+
+
+// NoRecoil is not working. But heavy machine gun recoil was 0.65f when +15% on lancer buff
+
+LPVOID primaryADSRecoilPointerchain[] = {
+    (LPVOID)0x050CAF48,
+    (LPVOID)0x130,
+    (LPVOID)0x370,
+    (LPVOID)0x20,
+    (LPVOID)0xA8,
+    (LPVOID)0xA8,
+    (LPVOID)0x5C8,
+    (LPVOID)0x204,
+};
+
+
+UINT8 primaryADSRecoilPointerchainSize = 8;
+
+
+LPVOID primaryNoADSRecoilPointerchain[] = {
+    primaryADSRecoilPointerchain[0],
+    primaryADSRecoilPointerchain[1],
+    primaryADSRecoilPointerchain[2],
+    primaryADSRecoilPointerchain[3],
+    primaryADSRecoilPointerchain[4],
+    primaryADSRecoilPointerchain[5],
+    primaryADSRecoilPointerchain[6],
+    (LPVOID)0x1EC,
+};
+
+
+UINT8 primaryNoADSRecoilPointerchainSize = 8;
+
+
 //// Secondary
 
 LPVOID secondaryMagazinePointerchain[] = {
@@ -116,34 +162,52 @@ UINT8 secondaryTotalAmmoPointerchainSize = 8;
 
 
 LPVOID secondarySpreadPointerchain[] = {
-    (LPVOID)0x0524F208,
-    (LPVOID)0x18,
-    (LPVOID)0x110,
-    (LPVOID)0xE0,
-    (LPVOID)0x250,
-    (LPVOID)0x120,
-    (LPVOID)0x8,
+    secondaryTotalAmmoPointerchain[0],
+    secondaryTotalAmmoPointerchain[1],
+    secondaryTotalAmmoPointerchain[2],
+    secondaryTotalAmmoPointerchain[3],
+    secondaryTotalAmmoPointerchain[4],
+    secondaryTotalAmmoPointerchain[5],
+    secondaryTotalAmmoPointerchain[6],
     (LPVOID)0x7E8,
 };
-
 
 
 UINT8 secondarySpreadPointerchainSize = 8;
 
 
 
-LPVOID primarySpreadPointerchain[] = {
+LPVOID secondaryADSRecoilPointerchain[] = {
     (LPVOID)0x050CC278,
     (LPVOID)0x28,
     (LPVOID)0x8,
-    (LPVOID)0x170,
-    (LPVOID)0xB8,
-    (LPVOID)0x120,
-    (LPVOID)0x0,
-    (LPVOID)0x7E8,
+    (LPVOID)0x340,
+    (LPVOID)0x5A0,
+    (LPVOID)0x204,
 };
 
-UINT8 primarySpreadPointerchainSize = 8;
+
+UINT8 secondaryADSRecoilPointerchainSize = 6;
+
+// 0.6451613307 Heavy machine rifle +15% lancer buff recoil value
+// 22352606CB4 secondary total ammo
+// 22352607004 ADS recoil
+// 22352606FEC No ADS recoil
+
+LPVOID secondaryNoADSRecoilPointerchain[] = {
+    secondaryADSRecoilPointerchain[0],
+    secondaryADSRecoilPointerchain[1],
+    secondaryADSRecoilPointerchain[2],
+    secondaryADSRecoilPointerchain[3],
+    secondaryADSRecoilPointerchain[4],
+    (LPVOID)0x1EC,
+};
+
+
+UINT8 secondaryNoADSRecoilPointerchainSize = 6;
+
+
+
 
 
 
@@ -462,9 +526,6 @@ LPVOID ingameConsumableTopAmountPointerchain[] = {
     (LPVOID)0xC40,
 };
 
-/// Its actually the same offset the the offsets for all the consumables in the HUB/menu
-/// The only difference is the 4th offset being 108 and not 110.
-
 UINT8 ingameConsumableTopAmountPointerchainSize = 8;
 
 LPVOID ingameConsumableRightAmountPointerchain[] = {
@@ -478,8 +539,6 @@ LPVOID ingameConsumableRightAmountPointerchain[] = {
     (LPVOID)0xC40,
 };
 
-/// Its actually the same offset the the offsets for all the consumables in the HUB/menu
-/// The only difference is the 4th offset being 108 and not 110.
 
 UINT8 ingameConsumableRightAmountPointerchainSize = 8;
 
@@ -576,6 +635,33 @@ LPVOID staminaPointerchain[] = {
 };
 
 UINT8 staminaPointerchainSize = 8;
+
+LPVOID maxWalkSpeedPointerchain[] = {
+    staminaPointerchain[0],
+    staminaPointerchain[1],
+    staminaPointerchain[2],
+    staminaPointerchain[3],
+    staminaPointerchain[4],
+    staminaPointerchain[5],
+    staminaPointerchain[6],
+    (LPVOID)0x3C,
+};
+
+UINT8 maxWalkSpeedPointerchainSize = 8;
+
+LPVOID sprintSpeedPointerchain[] = {
+    staminaPointerchain[0],
+    staminaPointerchain[1],
+    staminaPointerchain[2],
+    staminaPointerchain[3],
+    staminaPointerchain[4],
+    staminaPointerchain[5],
+    staminaPointerchain[6],
+    (LPVOID)0x54,
+};
+
+UINT8 sprintSpeedPointerchainSize = 8;
+
 
 
 /// Stamina Patch ! DO NOT USE

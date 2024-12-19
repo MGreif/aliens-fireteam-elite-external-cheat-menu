@@ -5,6 +5,11 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aliens_Fireteam_Elite_external_hack", "Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.vcxproj", "{EDFD2311-EFB0-441D-9AE7-BDF017A5CC85}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{89FA9EAD-3A25-4D7E-8DBE-EECB08368F7A}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
