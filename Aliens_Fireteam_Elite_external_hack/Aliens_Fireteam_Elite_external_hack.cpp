@@ -78,39 +78,86 @@ void startInfiniteStaminaThread(LPVOID lpParam) {
     }
 }
 
+typedef BOOL (*MemoryPatchCallback)(HANDLE hProcess, LPVOID baseAddress);
+
+struct MemoryPatchLoopUnitOfWork {
+    MemoryPatchCallback callback;
+    BOOL active;
+};
+
+struct MemoryPatchLoopParam {
+    HANDLE hProcess;
+    LPVOID baseAddress;
+    MemoryPatchLoopUnitOfWork** unitOfWorks; // Array of pointers
+    UINT8 unitOfWorksSize;
+};
+
+void startMemoryPatchLoop(LPVOID lpParam) {
+    MemoryPatchLoopParam* params = reinterpret_cast<MemoryPatchLoopParam*>(lpParam);
+    std::cout << "Hello from thread: " << GetCurrentThreadId() << std::endl;
+    std::cout << "Starting memory patch loop" << std::endl;
+
+    while (true) {
+        for (int i = 0; i < params->unitOfWorksSize; i++) {
+            MemoryPatchLoopUnitOfWork* currentUnit = params->unitOfWorks[i];
+            if (currentUnit->active) {
+                if (!currentUnit->callback(params->hProcess, params->baseAddress)) {
+                    std::cout << "Could not perform unit of work ...";
+                }
+            }
+        }
+        Sleep(100);
+    }
+}
 
 // Unfortunately this is the current WIP implementation for no recoil....
 // The recoil often gets adjusted by certain events (i.e. lancers passive or some abilities)
 // I was to lazy to figure out the unreal-engine functions and implement conditional checks wether a "setNumericalAttribute" function was called with recoil params etc.
 // So thats how it is now lol
 // Also, with lancer its working quite reliably, but with others the secondary weapon offsets may be wrong. A fix is WIP rn.
-// TODO: Dont start a new thread for each loop. Instead create small unit of works that can be passed into one worker thread that executes each X ms and this one dynamically does what is selected (no recoil, infinite stamina etc)
-void startNoRecoilThread(LPVOID lpParam) {
-    threadParam* params = reinterpret_cast<threadParam*>(lpParam);
-    std::cout << "Hello from thread: " << GetCurrentThreadId() << std::endl;
-    std::cout << "Starting infinite loop" << std::endl;
-    while (true) {
-        std::cout << "Setting no recoil" << std::endl;
-        if (setPrimaryNoRecoil(params->hProcess, (LPVOID)params->baseAddress) > 0) {
-            std::cout << "Could not remove primary weapon recoil" << std::endl;
-            std::cout << GetLastError() << std::endl;
-            return;
-        }
-        else {
-            std::cout << "Removed primary weapon recoil. Might change back if game changes it using buff or effect" << std::endl;
-        }
 
-        if (setSecondaryNoRecoil(params->hProcess, (LPVOID)params->baseAddress) > 0) {
-            std::cout << "Could not remove secondary weapon recoil" << std::endl;
-            std::cout << GetLastError() << std::endl;
-            return;
-        }
-        else {
-            std::cout << "Removed secondary weapon recoil. Might change back if game changes it using buff or effect" << std::endl;
-        }
-        Sleep(100);
+BOOL noRecoilUnitOfWorkCallback(HANDLE hProcess, LPVOID baseAddress) {
+    if (setPrimaryNoRecoil(hProcess, baseAddress) > 0) {
+        std::cout << "Could not remove primary weapon recoil" << std::endl;
+        std::cout << GetLastError() << std::endl;
+        return false;
     }
+
+
+    if (setSecondaryNoRecoil(hProcess, baseAddress) > 0) {
+        std::cout << "Could not remove secondary weapon recoil" << std::endl;
+        std::cout << GetLastError() << std::endl;
+        return false;
+    }
+
+    return true;
 }
+
+
+BOOL infiniteStaminaUnitOfWorkCallback(HANDLE hProcess, LPVOID baseAddress) {
+    char buffer[] = { 0x0, 0x0, 0xc8, 0x42 }; // float 100.0f little-endian
+    if (!writeMemory(hProcess, baseAddress, staminaPointerchain, staminaPointerchainSize, buffer, sizeof(buffer))) {
+        std::cout << "Could not patch memory ...";
+        return false;
+    }
+    return true;
+}
+
+MemoryPatchLoopUnitOfWork noRecoilUnitOfWork = {
+        (MemoryPatchCallback)noRecoilUnitOfWorkCallback,
+        false,
+};
+
+MemoryPatchLoopUnitOfWork infiniteStaminaUnitOfWork = {
+        (MemoryPatchCallback)infiniteStaminaUnitOfWorkCallback,
+        false,
+};
+
+MemoryPatchLoopUnitOfWork* unitOfWorks[] = {
+    &noRecoilUnitOfWork,
+    &infiniteStaminaUnitOfWork
+};
+
 
 
 BOOL setIngameTopAndRightConsumableTo99(HANDLE hProcess, LPVOID baseAddress) {
@@ -258,23 +305,6 @@ BOOL setIngameConsumablesTo999(HANDLE hProcess, LPVOID baseAddress) {
 }
 
 
-// This should not be used as it will NOP all important events and kindof crash the game lol
-BOOL removeStaminaStarvation(HANDLE hProcess, LPVOID baseAddress) {
-
-    uintptr_t address = (uintptr_t)baseAddress + staminaReductionDamping.address;
-
-    if (!patchMemory(hProcess, (LPVOID)address, staminaReductionDamping)) {
-        std::cout << "Could not patch memory ..." << std::endl;
-        return 1;
-    }
-    else {
-        std::cout << "Patched stamina starvation" << std::endl;
-    }
-
-    return 0;
-}
-
-
 BOOL setPrimaryMagazine(HANDLE hProcess, LPVOID baseAddress) {
     std::cout << "Setting current magazine ammo to 9999 (0x270F)" << std::endl;
     char buffer[] = { 0x0F, 0x27 };
@@ -343,10 +373,20 @@ int main(int argc, char** argv)
     uintptr_t baseAddress = GetModuleBaseAddress(pid, PROCESS_NAME);
 
 
-    threadParam params = {
+    MemoryPatchLoopParam params = {
         hProcess,
-        (LPVOID)baseAddress
+        (LPVOID)baseAddress,
+        unitOfWorks,
+        2
     };
+
+    HANDLE hThread = CreateThread(NULL, 4096, (LPTHREAD_START_ROUTINE)startMemoryPatchLoop, (LPVOID)&params, 0, NULL);
+    if (!hThread) {
+        std::cout << "Could not start new thread ..." << std::endl;
+    }
+    else {
+        std::cout << "Started new thread. Thread ID: " << GetThreadId(hThread) << std::endl;
+    }
 
     while (!stop) {
 
@@ -356,11 +396,11 @@ int main(int argc, char** argv)
         printf("[In an active game]\n");
         printf("1: Set current weapon ammo to 9999\n");
         printf("2: Remove weapon spread\n");
-        printf("3: Infinite stamina\n");
+        printf("3: Toggle Infinite stamina %s\n", infiniteStaminaUnitOfWork.active ? "[active]" : "");
         printf("5: Set top and right consumable amount to 99\n");
         printf("6: Set max walk speed to 5000\n");
         printf("7: Set sprint speed to 5000\n");
-        printf("8: Remove weapon recoil\n\n");
+        printf("8: Toggle weapon no-recoil %s\n\n", noRecoilUnitOfWork.active ? "[active]" : "");
         printf("[In the hub-world]\n");
         printf("4: Set all consumables to 999\n");
         printf("0: Exit\n\n\n");
@@ -397,13 +437,7 @@ int main(int argc, char** argv)
             }
         }
         else if (strncmp(buffer, "3", 1) == 0) {
-            HANDLE hThread = CreateThread(NULL, 4096, (LPTHREAD_START_ROUTINE)startInfiniteStaminaThread, (LPVOID)&params, 0, NULL);
-            if (!hThread) {
-                std::cout << "Could not start new thread ..." << std::endl;
-            }
-            else {
-                std::cout << "Started new thread. Thread ID: " << GetThreadId(hThread) << std::endl;
-            }
+            infiniteStaminaUnitOfWork.active = !infiniteStaminaUnitOfWork.active;
         }
         else if (strncmp(buffer, "4", 1) == 0) {
             if (setConsumablesTo999(hProcess, (LPVOID)baseAddress) > 0) {
@@ -446,13 +480,7 @@ int main(int argc, char** argv)
             }
         }
         else if (strncmp(buffer, "8", 1) == 0) {
-            HANDLE hThread = CreateThread(NULL, 4096, (LPTHREAD_START_ROUTINE)startNoRecoilThread, (LPVOID)&params, 0, NULL);
-            if (!hThread) {
-                std::cout << "Could not start new thread ..." << std::endl;
-            }
-            else {
-                std::cout << "Started new thread. Thread ID: " << GetThreadId(hThread) << std::endl;
-            }
+            noRecoilUnitOfWork.active = !noRecoilUnitOfWork.active;
         }
 
         else if (strncmp(buffer, "0", 1) == 0) {
