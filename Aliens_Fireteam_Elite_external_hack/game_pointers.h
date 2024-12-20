@@ -178,16 +178,18 @@ UINT8 secondarySpreadPointerchainSize = 8;
 
 
 LPVOID secondaryADSRecoilPointerchain[] = {
-    (LPVOID)0x050CC278,
+    (LPVOID)0x050CC240,
+    (LPVOID)0x8,
+    (LPVOID)0x20,
     (LPVOID)0x28,
     (LPVOID)0x8,
-    (LPVOID)0x340,
+    (LPVOID)0x370,
     (LPVOID)0x5A0,
     (LPVOID)0x204,
 };
 
 
-UINT8 secondaryADSRecoilPointerchainSize = 6;
+UINT8 secondaryADSRecoilPointerchainSize = 8;
 
 // 0.6451613307 Heavy machine rifle +15% lancer buff recoil value
 // 22352606CB4 secondary total ammo
@@ -200,11 +202,13 @@ LPVOID secondaryNoADSRecoilPointerchain[] = {
     secondaryADSRecoilPointerchain[2],
     secondaryADSRecoilPointerchain[3],
     secondaryADSRecoilPointerchain[4],
+    secondaryADSRecoilPointerchain[5],
+    secondaryADSRecoilPointerchain[6],
     (LPVOID)0x1EC,
 };
 
 
-UINT8 secondaryNoADSRecoilPointerchainSize = 6;
+UINT8 secondaryNoADSRecoilPointerchainSize = 8;
 
 
 
@@ -662,26 +666,30 @@ LPVOID sprintSpeedPointerchain[] = {
 
 UINT8 sprintSpeedPointerchainSize = 8;
 
-
-
-/// Stamina Patch ! DO NOT USE
-
-char staminaReductionDampingPatchCode[] = {
-    0x90,
-    0x90,
-    0x90,
-    0x90,
-    0x90,
+LPVOID ingameHealthPointerchain[] = {
+    (LPVOID)0x052C5840,
+    (LPVOID)0x30,
+    (LPVOID)0x260,
+    (LPVOID)0x190,
+    (LPVOID)0x8,
+    (LPVOID)0x140,
+    (LPVOID)0x28,
+    (LPVOID)0x38,
 };
 
-char staminaReductionDampingOriginalCode[sizeof(staminaReductionDampingPatchCode)] = { 0 };
+UINT8 ingameHealthPointerchainSize = 8;
 
-MemoryPatch staminaReductionDamping = {
-    staminaReductionDampingOriginalCode,
-    staminaReductionDampingPatchCode,
-    5,
-    0x900710 // 0x900710 (setPxJointLimitParametersDamping base) + 0x0
+LPVOID ingameHealthPointerchain2[] = {
+    ingameHealthPointerchain[0],
+    ingameHealthPointerchain[1],
+    ingameHealthPointerchain[2],
+    ingameHealthPointerchain[3],
+    ingameHealthPointerchain[4],
+    ingameHealthPointerchain[5],
+    ingameHealthPointerchain[6],
+    (LPVOID)0x3C,
 };
 
+UINT8 ingameHealthPointerchain2Size = 8;
 
 #endif // !GAME_POINTERS_AFE

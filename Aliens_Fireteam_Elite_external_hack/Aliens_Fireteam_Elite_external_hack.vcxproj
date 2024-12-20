@@ -128,10 +128,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Aliens_Fireteam_Elite_external_hack.cpp" />
+    <ClCompile Include="HackLogic.cpp" />
+    <ClCompile Include="LoopThread.cpp" />
     <ClCompile Include="Memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game_pointers.h" />
+    <ClInclude Include="HackLogic.hpp" />
+    <ClInclude Include="LoopThread.hpp" />
     <ClInclude Include="Memory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
