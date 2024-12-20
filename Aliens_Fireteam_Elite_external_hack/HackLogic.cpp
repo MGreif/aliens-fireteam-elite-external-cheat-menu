@@ -198,7 +198,7 @@ BOOL setHealthToMax(HANDLE hProcess, LPVOID baseAddress) {
 
 BOOL setIngameTopAndRightConsumableTo99(HANDLE hProcess, LPVOID baseAddress) {
 
-    if (setIngameConsumablesTo999(hProcess, baseAddress) > 0) {
+    if (!setIngameConsumablesTo999(hProcess, baseAddress)) {
         return 1;
     }
 
