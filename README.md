@@ -23,11 +23,14 @@ The ammo seems to be broken a bit. You can set it to 9999 but after the actual a
 
 Features labled with [ingame] should only be activated in an active game. If not, it will not crash, but simply not work.
 
-- Set ammo to 9999 (both guns) [ingame]
 - Set all consumables to 999
+- Set ammo to 9999 (both guns) [ingame]
 - Set ingame consumables (top and right) to 99 [ingame]
 - No spread [ingame]
+- No recoil [ingame]
 - Infinite stamina (quite amateur way right now, ill change it in the future) [ingame]
+- Godmode (infinite health) [ingame]
+- Superspeed [ingame]
 
 I am working on more.
 
