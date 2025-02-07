@@ -1,51 +1,7 @@
-﻿  HackLogic.cpp
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(569,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(569,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(570,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(570,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(571,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(571,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(572,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(572,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(573,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(573,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(574,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(574,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(575,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(575,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(576,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(576,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(590,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(590,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(591,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(591,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(592,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(592,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(593,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(593,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(594,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(594,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(595,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(595,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(596,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(596,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(597,5): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\game_pointers.h(597,5): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(144,34): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(144,34): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(158,34): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(158,34): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(170,33): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(170,33): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(182,28): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(182,28): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(182,34): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(182,34): warning C4309: 'initializing': truncation of constant value
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(237,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.cpp(237,23): warning C4309: 'initializing': truncation of constant value
+﻿  Aliens_Fireteam_Elite_external_hack.cpp
   Generating code
-  2 of 68 functions ( 2.9%) were compiled, the rest were copied from previous compilation.
+  2 of 67 functions ( 3.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  Aliens_Fireteam_Elite_external_hack.vcxproj -> C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\x64\Release\Aliens_Fireteam_Elite_external_hack.exe
+  Aliens_Fireteam_Elite_external_hack.vcxproj -> P:\projects\Aliens_Fireteam_Elite_external_hack\x64\Release\Aliens_Fireteam_Elite_external_hack.exe

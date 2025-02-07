@@ -18,6 +18,25 @@ extern MemoryPatchLoopUnitOfWork infiniteStaminaUnitOfWork;
 extern MemoryPatchLoopUnitOfWork noRecoilUnitOfWork;
 extern MemoryPatchLoopUnitOfWork godmodeUnitOfWork;
 
+void printUsage(bool bClearScreenBefore) {
+    if (bClearScreenBefore) {
+        system("cls");
+    }
+    printf("Options:\n");
+    printf("[In an active game]\n");
+    printf("1: Set current weapon ammo to 9999\n");
+    printf("2: Remove weapon spread\n");
+    printf("3: Toggle Infinite stamina %s\n", infiniteStaminaUnitOfWork.active ? "\x1B[31m[active]\x1B[97m" : "");
+    printf("5: Set top and right consumable amount to 99\n");
+    printf("6: Set max walk speed to 5000\n");
+    printf("7: Set sprint speed to 5000\n");
+    printf("8: Toggle weapon no-recoil %s\n", noRecoilUnitOfWork.active ? "\x1B[31m[active]\x1B[97m" : "");
+    printf("9: Toggle godmode %s\n\n", godmodeUnitOfWork.active ? "\x1B[31m[active]\x1B[97m" : "");
+    printf("[In the hub-world]\n");
+    printf("4: Set all consumables to 999\n");
+    printf("0: Exit\n\n\n");
+}
+
 int main(int argc, char** argv)
 {
 
@@ -58,27 +77,19 @@ int main(int argc, char** argv)
         std::cout << "Started new thread. Thread ID: " << GetThreadId(hThread) << std::endl;
     }
 
+    bool bKeyCurrentlyPressed = false;
+
+
+    printUsage(true);
+
     while (!stop) {
 
         char buffer[5]{ 0 };
 
-        printf("Options:\n");
-        printf("[In an active game]\n");
-        printf("1: Set current weapon ammo to 9999\n");
-        printf("2: Remove weapon spread\n");
-        printf("3: Toggle Infinite stamina %s\n", infiniteStaminaUnitOfWork.active ? "[active]" : "");
-        printf("5: Set top and right consumable amount to 99\n");
-        printf("6: Set max walk speed to 5000\n");
-        printf("7: Set sprint speed to 5000\n");
-        printf("8: Toggle weapon no-recoil %s\n", noRecoilUnitOfWork.active ? "[active]" : "");
-        printf("9: Toggle godmode %s\n\n", godmodeUnitOfWork.active ? "[active]" : "");
-        printf("[In the hub-world]\n");
-        printf("4: Set all consumables to 999\n");
-        printf("0: Exit\n\n\n");
-        scanf_s("%s",&buffer,sizeof(buffer));
+
         fflush(stdin);
-        system("cls");
-        if (strncmp(buffer, "1",1) == 0) {
+        if (GetAsyncKeyState(VK_NUMPAD1) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!setPrimaryMagazine(hProcess, (LPVOID)baseAddress)) {
                 std::cout << GetLastError() << std::endl;
                 return WIN_ERROR;
@@ -97,7 +108,8 @@ int main(int argc, char** argv)
             }
 
         }
-        else if (strncmp(buffer, "2", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD2) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!removeWeaponSpray(hProcess, (LPVOID)baseAddress)) {
                 std::cout << "Could not remove weapon spread" << std::endl;
                 std::cout << GetLastError() << std::endl;
@@ -107,10 +119,12 @@ int main(int argc, char** argv)
                 std::cout << "Removed weapon spread :)" << std::endl;
             }
         }
-        else if (strncmp(buffer, "3", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD3) & 0x01 && !bKeyCurrentlyPressed) {
             infiniteStaminaUnitOfWork.active = !infiniteStaminaUnitOfWork.active;
+            printUsage(true);
         }
-        else if (strncmp(buffer, "4", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD4) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!setConsumablesTo999(hProcess, (LPVOID)baseAddress)) {
                 std::cout << "Could not set consumables" << std::endl;
                 std::cout << GetLastError() << std::endl;
@@ -120,7 +134,8 @@ int main(int argc, char** argv)
                 std::cout << "Set all consumables to 999 :)" << std::endl;
             }
         }
-        else if (strncmp(buffer, "5", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD5) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!setIngameTopAndRightConsumableTo99(hProcess, (LPVOID)baseAddress)) {
                 std::cout << "Could not set consumable" << std::endl;
                 std::cout << GetLastError() << std::endl;
@@ -130,7 +145,8 @@ int main(int argc, char** argv)
                 std::cout << "Set consumable to 99 :)" << std::endl;
             }
         }
-        else if (strncmp(buffer, "6", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD6) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!setWalkSpeedTo5000(hProcess, (LPVOID)baseAddress)) {
                 std::cout << "Could not set walk speed" << std::endl;
                 std::cout << GetLastError() << std::endl;
@@ -140,7 +156,8 @@ int main(int argc, char** argv)
                 std::cout << "Set walk speed to 5000 :). This might get reset on walk speed changes in game" << std::endl;
             }
         }
-        else if (strncmp(buffer, "7", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD7) & 0x01 && !bKeyCurrentlyPressed) {
+            printUsage(true);
             if (!setSprintSpeedTo5000(hProcess, (LPVOID)baseAddress)) {
                 std::cout << "Could not set sprint speed" << std::endl;
                 std::cout << GetLastError() << std::endl;
@@ -150,21 +167,22 @@ int main(int argc, char** argv)
                 std::cout << "Set sprint speed to 5000 :). This might get reset on walk speed changes in game" << std::endl;
             }
         }
-        else if (strncmp(buffer, "8", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD8) & 0x01 && !bKeyCurrentlyPressed) {
             noRecoilUnitOfWork.active = !noRecoilUnitOfWork.active;
+            printUsage(true);
         }
-        else if (strncmp(buffer, "9", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD9) & 0x01 && !bKeyCurrentlyPressed) {
             godmodeUnitOfWork.active = !godmodeUnitOfWork.active;
+            printUsage(true);
         }
 
-        else if (strncmp(buffer, "0", 1) == 0) {
+        else if (GetAsyncKeyState(VK_NUMPAD0) & 0x01 && !bKeyCurrentlyPressed) {
             break;
         }
         else {
-            printf("Unknown...");
+            if (bKeyCurrentlyPressed == true) bKeyCurrentlyPressed = false;
         }
-        printf("\n\n");
-
+        Sleep(100);
     }
 
     std::cout << "Exiting hack :)" << std::endl;
