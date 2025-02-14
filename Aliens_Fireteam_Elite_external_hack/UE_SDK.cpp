@@ -32,6 +32,7 @@ namespace UE_SDK {
 
         result = uObject->findName();
 
+
         free(uObject);
         return result;
     }
@@ -43,20 +44,22 @@ namespace UE_SDK {
             return false;
         }
 
-        if (strncmp(this->asciiName, "", 4)) return false;
 
 
         return true;
     }
     bool UProperty::isUProperty(uintptr_t pTarget) {
         bool result = true;
-
+        printf("Checking isUProperty for %p\n", pTarget);
         UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
+        memset(uProperty, 0, sizeof(uProperty));
         if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uProperty, sizeof(UProperty), NULL)) {
             ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", pTarget, uProperty, GetLastError());
             free(uProperty);
             return false;
         }
+
+        DEBUG_SDK&& printf("NameIndex: %p\n", uProperty->name);
 
         if (pSdk->mem->IsBadReadPtr((LPVOID)uProperty->pOwner) || pSdk->mem->IsBadReadPtr((LPVOID)uProperty->vTable)) {
             ERROR_TRACE&& printf("[!][isUProperty] pOwner (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uProperty->pOwner, uProperty->vTable, GetLastError());
@@ -70,9 +73,7 @@ namespace UE_SDK {
         }
 
         result = uProperty->findName();
-        if (strncmp(uProperty->asciiName, NAME_EMPTY, sizeof(NAME_EMPTY)) == 0) {
-            return false;
-        }
+
         return result;
     }
 
@@ -220,18 +221,18 @@ namespace UE_SDK {
             return false;
         }
 
-        printf("[%s]\n", UObjectName);
+        DEBUG_SDK&& printf("[%s]\n", UObjectName);
 
 
-        for (int i = sizeof(UObject); i < size; i = i + 8) {
+        for (int i = 0x20; i < size; i = i + 8) {
 
             uintptr_t ptr = *reinterpret_cast<uintptr_t*>((uintptr_t)(char*)pUOBject + i);
 
-            DEBUG_SDK&& printf("Child QWORD (%p) (0x%x)\n", ptr, i);
+            DEBUG_SDK&&  printf("Child QWORD (%p) (0x%x)\n", ptr, i);
 
 
             if (pSdk->mem->IsBadReadPtr((LPVOID)ptr)) {
-                ERROR_TRACE&& printf("[!] Child QWORD (%p) is not a valid pointer ....\n", ptr);
+                ERROR_TRACE&& printf("[!] Child QWORD (%p) (0x%x) is not a valid pointer ....\n", ptr, i);
                 continue;
             };
 
@@ -246,10 +247,17 @@ namespace UE_SDK {
 
             }
             else if (UProperty::isUProperty(ptr)) {
-                
-                UProperty uProperty = UProperty();
-                uProperty.findName();
-                printf("- [%p] [0x%x] [UProperty] %s\n", ptr, i, uProperty.asciiName);
+                UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
+
+                memset(uProperty, 0, sizeof(uProperty));
+                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)ptr, uProperty, sizeof(UProperty), NULL)) {
+                    ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", ptr, uProperty, GetLastError());
+                    free(uProperty);
+                    return false;
+                }
+
+                uProperty->findName();
+                printf("- [%p] [0x%x] [UProperty] %s\n", ptr, i, uProperty->asciiName);
             }
             else if (UObject::isUObject(ptr)) {
                 UObject* pChildUOBject = (UObject*)malloc(size);

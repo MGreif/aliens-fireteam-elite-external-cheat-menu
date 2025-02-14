@@ -1,16 +1,153 @@
-﻿  Aliens_Fireteam_Elite_external_hack.cpp
+﻿  UE_SDK.cpp
 P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.hpp(22,10): warning C4200: nonstandard extension used: zero-sized array in struct/union
-  (compiling source file 'Aliens_Fireteam_Elite_external_hack.cpp')
+  (compiling source file 'UE_SDK.cpp')
       P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.hpp(22,10):
       This member will be ignored by a defaulted constructor or copy/move assignment operator
   
-P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(94,13): warning C4477: 'wprintf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
-P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(119,12): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
-P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(119,12): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 3 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(20,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(20,28): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 2 has type 'HANDLE'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(20,28): warning C4313: 'printf': '%x' in format string conflicts with argument 2 of type 'HANDLE'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(22,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(28,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(28,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(53,16): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(57,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(62,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'UINT64'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(65,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(65,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(82,24): warning C4244: 'initializing': conversion from 'UINT64' to 'UINT16', possible loss of data
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(83,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(83,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(83,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(83,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(83,29): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 3 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(87,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(87,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(87,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(87,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(87,29): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 4 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(91,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(91,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(91,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(91,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29): warning C4477: 'printf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 2 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%llu' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%Iu' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(95,29):
+      consider using '%I64u' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(98,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(98,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(98,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(98,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(98,29): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 3 has type 'UINT64'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29): warning C4473: 'printf' : not enough arguments passed for format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29):
+      placeholders and their parameters expect 3 variadic arguments, but 2 were provided
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(99,29):
+      the missing variadic argument 3 is required by format string '%u'
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(144,34): warning C4477: 'printf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'UINT64'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(144,34):
+      consider using '%llu' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(144,34):
+      consider using '%Iu' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(144,34):
+      consider using '%I64u' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(160,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(172,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'UINT64'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(199,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(203,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(206,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(207,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(207,28): warning C4477: 'printf' : format string '%x' requires an argument of type 'unsigned int', but variadic argument 2 has type 'uintptr_t'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(207,28):
+      consider using '%llx' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(207,28):
+      consider using '%Ix' in the format string
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(207,28):
+      consider using '%I64x' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(212,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(216,28): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(220,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(220,34): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(231,33): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(235,38): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(246,24): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(254,42): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(260,24): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(265,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(273,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(277,40): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(282,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(282,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(293,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(299,24): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(308,36): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 1 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(321,16): warning C4129: 'm': unrecognized character escape sequence
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(333,24): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 2 has type 'UINT64'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(333,24): warning C4477: 'printf' : format string '%p' requires an argument of type 'void *', but variadic argument 3 has type 'uintptr_t'
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(333,24): warning C4477: 'printf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 5 has type 'size_t'
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(333,24):
+      consider using '%zu' in the format string
+  
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Memory.h(69,15): warning C4101: 'oldProtect': unreferenced local variable
+  (compiling source file 'UE_SDK.cpp')
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Memory.h(69,15):
+      the template instantiation context (the oldest one first) is
+          P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(90,35):
+          see reference to function template instantiation 'MemType *RemoteMem::read<void*>(HANDLE,MemType *)' being compiled
+          with
+          [
+              MemType=void *
+          ]
+  
+  UE_SDK.hpp
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.hpp(22,10): warning C4200: nonstandard extension used: zero-sized array in struct/union
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.hpp(22,10):
+      This member will be ignored by a defaulted constructor or copy/move assignment operator
+  
 x64\Release\UE_SDK.obj : warning LNK4042: object specified more than once; extras ignored
   Generating code
-  2 of 98 functions ( 2.0%) were compiled, the rest were copied from previous compilation.
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\UE_SDK.cpp(317): warning C4715: 'UE_SDK::traverseUObjectForMembersEtc': not all control paths return a value
+  20 of 97 functions (20.6%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    4 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Aliens_Fireteam_Elite_external_hack.vcxproj -> P:\projects\Aliens_Fireteam_Elite_external_hack\x64\Release\Aliens_Fireteam_Elite_external_hack.exe

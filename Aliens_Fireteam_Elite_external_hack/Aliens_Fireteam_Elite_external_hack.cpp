@@ -123,7 +123,7 @@ bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
     sdk.initMem(mem);
 
 
-    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x00000020981D4B680, 0xDDDD,0, 1)) {
+    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x02085F3AB800, 0x1000,0, 1)) {
         return false;
     }
 

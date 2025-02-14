@@ -58,9 +58,13 @@ namespace UE_SDK {
         uintptr_t vTable;
         uintptr_t pad1;
         uintptr_t pOwner;
+        uintptr_t pad2;
         UINT64 flags;
         UINT64 name;
         //Own methods
+        UProperty(uintptr_t pTarget) {
+            this->isUProperty(pTarget);
+        }
         bool static isUProperty(uintptr_t pTarget);
         bool findName();
         char asciiName[NAME_LENGTH] = NAME_EMPTY;
