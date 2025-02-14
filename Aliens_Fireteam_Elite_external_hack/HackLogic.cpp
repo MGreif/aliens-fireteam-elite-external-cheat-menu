@@ -278,7 +278,7 @@ BOOL setIngameConsumablesTo999(HANDLE hProcess, LPVOID baseAddress) {
 // Entities
 
 BOOL printEntitiesHealth(HANDLE hProcess, LPVOID baseAddress) {
-    EntityWrapper** pEntityList = reinterpret_cast<EntityWrapper**>(getDynamicMemoryAddress(hProcess, baseAddress, ingameEntityListPointerchain, ingameEntityListPointerchainSize));
+    EntityWrapper** pEntityList = reinterpret_cast<EntityWrapper**>(Mem::getDynamicMemoryAddress(hProcess, baseAddress, ingameEntityListPointerchain, ingameEntityListPointerchainSize));
 
     UINT8 uAmountEntities = 100;
     int count = 0;
@@ -337,7 +337,7 @@ BOOL printEntitiesHealth(HANDLE hProcess, LPVOID baseAddress) {
 
 
 
-
+/*
 
 
 BOOL FNamePoolIntern::getName(HANDLE hProcess, UINT64 id, char name[NAME_LENGTH]) {
@@ -624,3 +624,4 @@ BOOL printEntitiesNames(HANDLE hProcess, LPVOID baseAddress) {
     return true;
 }
 
+*/

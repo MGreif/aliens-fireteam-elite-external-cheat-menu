@@ -5,6 +5,8 @@
 #include <windows.h>
 
 #include <TlHelp32.h>
+#include "UE_SDK.hpp"
+
 #include "Memory.h"
 #include <stdio.h>
 #include "LoopThread.hpp"
@@ -22,6 +24,11 @@ extern MemoryPatchLoopUnitOfWork instakillUnitOfWork;
 
 bool hack(HANDLE hProcess, uintptr_t baseAddress);
 bool unreal(HANDLE hProcess, LPVOID baseAddress);
+
+
+int g_iMode = 0; // 1 for hack, 2 for sdk
+extern UE_SDK::Remote_SDK* pSdk ;
+
 
 void printUsage(bool bClearScreenBefore) {
     if (bClearScreenBefore) {
@@ -44,6 +51,22 @@ void printUsage(bool bClearScreenBefore) {
 
 int main(int argc, char** argv)
 {
+    UE_SDK::init();
+    if (argc < 2) {
+        printf("usage: hack.exe {sdk,hack}");
+        return false;
+    }
+
+    if (strncmp(argv[1], "hack", 4) == 0) {
+        g_iMode = 2;
+    }
+    else if (strncmp(argv[1], "sdk", 3) == 0) {
+        g_iMode = 1;
+    }
+    else {
+        printf("usage: hack.exe {sdk,hack}");
+        return false;
+    }
 
     DWORD pid = GetAlienFireteamElitePid();
 
@@ -65,39 +88,54 @@ int main(int argc, char** argv)
 
     uintptr_t baseAddress = GetModuleBaseAddress(pid, PROCESS_NAME);
 
+    wprintf(L"Found base address of the %s module: %p\n", PROCESS_NAME, baseAddress);
 
-    printf("What do you want to do?\n");
-    printf("1. Fancy Unreal Stuff\n");
-    printf("2. Gizz me hacks\n");
-
-
-    int choice = 0;
-    scanf_s("%d", &choice);
-    printf("Your choice: %d\n", choice);
-
-    if (choice == 1) {
+    if (g_iMode == 1) {
         unreal(hProcess, (LPVOID)baseAddress);
     }
-    else if (choice == 2) {
+    else if (g_iMode == 2) {
         return hack(hProcess, baseAddress);
     }
 
     return true;
 }
 
+LPVOID FNamePoolPointerchain[]{
+    (LPVOID)0x518EE98,
+    (LPVOID)0x0
+};
+
+UINT8 FNamePoolPointerchainSize = 2;
+
+
 bool unreal(HANDLE hProcess, LPVOID baseAddress) {
     
+    uintptr_t pGObjectsArray = 0x00007FF635937A08;
+    uintptr_t pFnamePool = (uintptr_t)Mem::getDynamicMemoryAddress(hProcess, baseAddress, FNamePoolPointerchain, FNamePoolPointerchainSize);
 
-    if (!traverseUObjectForMembersEtc(hProcess,  baseAddress, (uintptr_t)0x0000012B5D9D1C80, 0xDDDD)) {
-        return false;
-    }
+    printf("BaseAddress: %p pFnamePool %p pGObjectsArray %p\n", baseAddress, pFnamePool, pGObjectsArray);
 
-    if (!traverseUObjectForMembersEtc(hProcess, baseAddress, (uintptr_t)0x0000012AF9FCE080, 0xDDDD)) {
+    Mem mem = Mem(hProcess, PROCESS_NAME);
+    UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
+    sdk.initMem(&mem);
+
+    if (!UE_SDK::printAllGObjects()) {
         return false;
     }
 
     return true;
 
+    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x0000012B5D9D1C80, 0xDDDD)) {
+        return false;
+    }
+
+    if (!UE_SDK::traverseUObjectForMembersEtc((uintptr_t)0x0000012AF9FCE080, 0xDDDD)) {
+        return false;
+    }
+
+    return true;
+
+    /*
     if (!printAllGObjects(hProcess, baseAddress)) {
         return false;
     }
@@ -109,6 +147,7 @@ bool unreal(HANDLE hProcess, LPVOID baseAddress) {
         return false;
     }
     return true;
+    */
 }
 
 

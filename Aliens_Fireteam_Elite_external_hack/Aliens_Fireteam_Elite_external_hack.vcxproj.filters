@@ -27,6 +27,12 @@
     <ClCompile Include="HackLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UE_SDK.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UE_SDK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory.h">

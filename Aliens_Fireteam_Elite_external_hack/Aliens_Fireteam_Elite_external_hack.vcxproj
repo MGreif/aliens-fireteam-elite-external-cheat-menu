@@ -118,6 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +132,8 @@
     <ClCompile Include="HackLogic.cpp" />
     <ClCompile Include="LoopThread.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="UE_SDK.cpp" />
+    <ClCompile Include="UE_SDK.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game_pointers.hpp" />

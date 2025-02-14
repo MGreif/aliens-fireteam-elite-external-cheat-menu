@@ -709,12 +709,6 @@ UINT8 ingameEntityListPointerchainSize = 4;
 
 // Unreal Engine 4.25
 
-LPVOID FNamePoolPointerchain[]{
-    (LPVOID)0x518EE98
-};
-
-UINT8 FNamePoolPointerchainSize = 1;
-
 
 // USE THE DATA_COLLECTOR_DLL baseAddress for this!!!!
 LPVOID GObjectsPointerchain[] = {
