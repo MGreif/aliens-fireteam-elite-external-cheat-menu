@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <windows.h>
+
 #include <TlHelp32.h>
 #include "Memory.h"
 #include <stdio.h>
@@ -17,6 +18,10 @@ extern UINT8 unitsOfWorkSize;
 extern MemoryPatchLoopUnitOfWork infiniteStaminaUnitOfWork;
 extern MemoryPatchLoopUnitOfWork noRecoilUnitOfWork;
 extern MemoryPatchLoopUnitOfWork godmodeUnitOfWork;
+extern MemoryPatchLoopUnitOfWork instakillUnitOfWork;
+
+bool hack(HANDLE hProcess, uintptr_t baseAddress);
+bool unreal(HANDLE hProcess, LPVOID baseAddress);
 
 void printUsage(bool bClearScreenBefore) {
     if (bClearScreenBefore) {
@@ -58,9 +63,57 @@ int main(int argc, char** argv)
         return WIN_ERROR;
     }
 
-    BOOL stop = false;
     uintptr_t baseAddress = GetModuleBaseAddress(pid, PROCESS_NAME);
 
+
+    printf("What do you want to do?\n");
+    printf("1. Fancy Unreal Stuff\n");
+    printf("2. Gizz me hacks\n");
+
+
+    int choice = 0;
+    scanf_s("%d", &choice);
+    printf("Your choice: %d\n", choice);
+
+    if (choice == 1) {
+        unreal(hProcess, (LPVOID)baseAddress);
+    }
+    else if (choice == 2) {
+        return hack(hProcess, baseAddress);
+    }
+
+    return true;
+}
+
+bool unreal(HANDLE hProcess, LPVOID baseAddress) {
+    
+
+    if (!traverseUObjectForMembersEtc(hProcess,  baseAddress, (uintptr_t)0x0000012B5D9D1C80, 0xDDDD)) {
+        return false;
+    }
+
+    if (!traverseUObjectForMembersEtc(hProcess, baseAddress, (uintptr_t)0x0000012AF9FCE080, 0xDDDD)) {
+        return false;
+    }
+
+    return true;
+
+    if (!printAllGObjects(hProcess, baseAddress)) {
+        return false;
+    }
+
+    return true;
+
+    if (printAllFNames(hProcess, baseAddress)) {
+        printf("[!]Failed printing all names!\n");
+        return false;
+    }
+    return true;
+}
+
+
+bool hack(HANDLE hProcess, uintptr_t baseAddress) {
+    BOOL stop = false;
 
     MemoryPatchLoopParam params = {
         hProcess,
@@ -173,6 +226,10 @@ int main(int argc, char** argv)
         }
         else if (GetAsyncKeyState(VK_NUMPAD9) & 0x01 && !bKeyCurrentlyPressed) {
             godmodeUnitOfWork.active = !godmodeUnitOfWork.active;
+            printUsage(true);
+        }
+        else if (GetAsyncKeyState(VK_ADD) & 0x01 && !bKeyCurrentlyPressed) {
+            instakillUnitOfWork.active = !instakillUnitOfWork.active;
             printUsage(true);
         }
 

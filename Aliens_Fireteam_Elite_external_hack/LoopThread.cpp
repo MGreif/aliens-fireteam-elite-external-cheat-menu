@@ -50,6 +50,15 @@ BOOL godmodeCallback(HANDLE hProcess, LPVOID baseAddress) {
     return true;
 };
 
+BOOL instakillCallback(HANDLE hProcess, LPVOID baseAddress) {
+    if (!printEntitiesHealth(hProcess, baseAddress)) {
+        std::cout << "Could not set health to zero" << std::endl;
+        std::cout << GetLastError() << std::endl;
+        return false;
+    }
+    return true;
+};
+
 
 MemoryPatchLoopUnitOfWork noRecoilUnitOfWork = {
     (MemoryPatchCallback)noRecoilUnitOfWorkCallback,
@@ -63,16 +72,22 @@ MemoryPatchLoopUnitOfWork infiniteStaminaUnitOfWork = {
 
 MemoryPatchLoopUnitOfWork godmodeUnitOfWork = {
     (MemoryPatchCallback)godmodeCallback,
-    false,
+    true,
+};
+
+MemoryPatchLoopUnitOfWork instakillUnitOfWork = {
+    (MemoryPatchCallback)instakillCallback,
+    true,
 };
 
 MemoryPatchLoopUnitOfWork* unitsOfWork[] = {
     &noRecoilUnitOfWork,
     &infiniteStaminaUnitOfWork,
-    &godmodeUnitOfWork
+    &godmodeUnitOfWork,
+    &instakillUnitOfWork
 };
 
-UINT8 unitsOfWorkSize = 3;
+UINT8 unitsOfWorkSize = 4;
 
 void startMemoryPatchLoop(LPVOID lpParam) {
     MemoryPatchLoopParam* params = reinterpret_cast<MemoryPatchLoopParam*>(lpParam);

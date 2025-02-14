@@ -32,7 +32,7 @@
     <ClInclude Include="Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_pointers.h">
+    <ClInclude Include="game_pointers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LoopThread.hpp">

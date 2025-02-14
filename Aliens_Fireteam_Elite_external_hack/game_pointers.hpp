@@ -692,4 +692,175 @@ LPVOID ingameHealthPointerchain2[] = {
 
 UINT8 ingameHealthPointerchain2Size = 8;
 
+
+
+// Entity list
+
+LPVOID ingameEntityListPointerchain[]{
+    (LPVOID)0x0524F1F8,
+    (LPVOID)0x40,
+    (LPVOID)0x240,
+    (LPVOID)0xE0,
+    (LPVOID)0xAC0,
+};
+
+UINT8 ingameEntityListPointerchainSize = 4;
+
+
+// Unreal Engine 4.25
+
+LPVOID FNamePoolPointerchain[]{
+    (LPVOID)0x518EE98
+};
+
+UINT8 FNamePoolPointerchainSize = 1;
+
+
+// USE THE DATA_COLLECTOR_DLL baseAddress for this!!!!
+LPVOID GObjectsPointerchain[] = {
+    (LPVOID)0xFC5A8
+};
+
+UINT8 GObjectsPointerchainSize = 1;
+
+
+
+// Created with ReClass.NET 1.2 by KN4CK3R
+
+class GamePointerChain1
+{
+public:
+    char pad_0000[64]; //0x0000
+    class GameInner1* pGameInner1; //0x0040
+}; //Size: 0x0048
+
+class GameInner1
+{
+public:
+    char pad_0000[576]; //0x0000
+    class GameInner2* pGameInner2; //0x0240
+    char pad_0248[1472]; //0x0248
+}; //Size: 0x0808
+
+class GameInner2
+{
+public:
+    char pad_0000[224]; //0x0000
+    class GameInner3* pGameInner3; //0x00E0
+    char pad_00E8[32]; //0x00E8
+}; //Size: 0x0108
+
+class EntityWrapper
+{
+public:
+    char pad_0000[2576]; //0x0000
+    class Entity* pEntity; //0x0A10
+    char pad_0A18[496]; //0x0A18
+}; //Size: 0x0C08
+
+class N000003F6
+{
+public:
+    char pad_0000[8]; //0x0000
+}; //Size: 0x0008
+
+class Entity
+{
+public:
+    char pad_0008[8]; //0x0008
+    class N00000634* N0000042A; //0x0010
+    char pad_0018[8]; //0x0018
+    class N0000067E* N0000042C; //0x0020
+    char pad_0028[16]; //0x0028
+    uint32_t N0000042F; //0x0038
+    float fHealth; //0x003C
+    char pad_0040[1096]; //0x0040
+
+    virtual void Function0() {}
+ //   virtual void Function1();
+ //   virtual void Function2();
+ //   virtual void Function3();
+ //   virtual void Function4();
+ //   virtual void Function5();
+ //   virtual void Function6();
+ //   virtual void Function7();
+ //   virtual void Function8();
+ //   virtual void Function9();
+}; //Size: 0x0488
+
+class GameInner3
+{
+public:
+    char pad_0000[2752]; //0x0000
+    class EntityWrapper* (*pEntityWrapperArray)[20]; //0x0AC0
+    char pad_0AC8[320]; //0x0AC8
+}; //Size: 0x0C08
+
+class N00000669
+{
+public:
+    char pad_0000[8]; //0x0000
+}; //Size: 0x0008
+
+class GamePointerChain2Stable
+{
+public:
+    char pad_0000[120]; //0x0000
+    class N000006A1* N0000067C; //0x0078
+}; //Size: 0x0080
+
+class N000006A1
+{
+public:
+    char pad_0000[112]; //0x0000
+    class N000006E7* N000006B0; //0x0070
+    char pad_0078[144]; //0x0078
+}; //Size: 0x0108
+
+class N000006E7
+{
+public:
+    char pad_0000[416]; //0x0000
+    class N0000078D* N0000071C; //0x01A0
+    char pad_01A8[608]; //0x01A8
+}; //Size: 0x0408
+
+class N0000078D
+{
+public:
+    char pad_0000[16]; //0x0000
+    class EntityWrapper* (*N00000790)[20]; //0x0010
+}; //Size: 0x0018
+
+class N000007FC
+{
+public:
+    char pad_0000[8]; //0x0000
+}; //Size: 0x0008
+
+class N00000634
+{
+public:
+    char pad_0000[72]; //0x0000
+}; //Size: 0x0048
+
+class N0000067E
+{
+public:
+    char pad_0000[72]; //0x0000
+}; //Size: 0x0048
+
+
+class UObject {
+public:
+    uintptr_t vTable;
+    UINT32 flags;
+    UINT32 internalIndex;
+    uintptr_t pClassPrivate;
+    uintptr_t name;
+    uintptr_t pClassOuter;
+};
+
+
+
 #endif // !GAME_POINTERS_AFE

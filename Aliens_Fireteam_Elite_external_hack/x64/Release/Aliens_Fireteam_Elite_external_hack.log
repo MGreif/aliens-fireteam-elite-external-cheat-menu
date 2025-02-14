@@ -1,6 +1,11 @@
 ﻿  Aliens_Fireteam_Elite_external_hack.cpp
+P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.hpp(52,10): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  (compiling source file 'Aliens_Fireteam_Elite_external_hack.cpp')
+      P:\projects\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\HackLogic.hpp(52,10):
+      This member will be ignored by a defaulted constructor or copy/move assignment operator
+  
   Generating code
-  2 of 67 functions ( 3.0%) were compiled, the rest were copied from previous compilation.
+  2 of 88 functions ( 2.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

@@ -48,12 +48,12 @@ LPVOID getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID* poin
         return pointerChain[0];
     }
 
-    DEBUG_AFE && std::cout << "First chain element: " << pointerChain[0] << std::endl;
-    DEBUG_AFE && std::cout << "Module base: " << baseAddress << std::endl;
-    DEBUG_AFE && std::cout << "intermediatPointerBuffer: " << intermediatPointerBuffer << std::endl;
+    DEBUG_AFE&& std::cout << "First chain element: " << pointerChain[0] << std::endl;
+    DEBUG_AFE&& std::cout << "Module base: " << baseAddress << std::endl;
+    DEBUG_AFE&& std::cout << "intermediatPointerBuffer: " << intermediatPointerBuffer << std::endl;
 
 
-    DEBUG_AFE && std::cout << "Reading initial base: " << base << std::endl;
+    DEBUG_AFE&& std::cout << "Reading initial base: " << base << std::endl;
 
     if (!ReadProcessMemory(hProcess, base, &intermediatPointerBuffer, sizeof(uintptr_t), NULL)) {
         std::cout << "Could not read memory, aborting ...." << std::endl;
@@ -61,18 +61,18 @@ LPVOID getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID* poin
         return 0;
     }
 
-    DEBUG_AFE && printf("Base pointer: %p\n", intermediatPointerBuffer);
+    DEBUG_AFE&& printf("Base pointer: %p\n", intermediatPointerBuffer);
     // Leave out the first and last entry. The first is instantly dereferenced and the last is not dereferenced
     for (int i = 1; i < arraylength - 1; i++) {
 
 
 
-        DEBUG_AFE && printf("pointer: %p\n", intermediatPointerBuffer);
+        DEBUG_AFE&& printf("pointer: %p\n", intermediatPointerBuffer);
 
         LPVOID newPointer = LPVOID((uintptr_t)intermediatPointerBuffer + (uintptr_t)pointerChain[i]);
-        DEBUG_AFE && printf("Dereferencing pointer at level %d: %p \n", i, intermediatPointerBuffer);
+        DEBUG_AFE&& printf("Dereferencing pointer at level %d: %p \n", i, intermediatPointerBuffer);
 
-        DEBUG_AFE && printf("Adding offset: %p + %x -> %p\n", intermediatPointerBuffer, (int)pointerChain[i], newPointer);
+        DEBUG_AFE&& printf("Adding offset: %p + %x -> %p\n", intermediatPointerBuffer, (int)pointerChain[i], newPointer);
 
         if (!ReadProcessMemory(hProcess, newPointer, &intermediatPointerBuffer, sizeof(intermediatPointerBuffer), NULL)) {
             std::cout << "Could not read memory, aborting ...." << std::endl;
@@ -84,10 +84,17 @@ LPVOID getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID* poin
 
     LPVOID finalAddress = LPVOID((uintptr_t)intermediatPointerBuffer + (uintptr_t)pointerChain[arraylength - 1]);
 
-    DEBUG_AFE && printf("Final result: %p\n", finalAddress);
+    DEBUG_AFE&& printf("Final result: %p\n", finalAddress);
 
     return finalAddress;
 }
+
+
+
+
+
+
+
 
 BOOL writeMemory(HANDLE hProcess, LPVOID baseAddress, LPVOID* pointerChain, UINT8 pointerChainSize, char buffer[], int bufferSize) {
 
@@ -154,5 +161,21 @@ BOOL patchMemory(HANDLE hProcess, LPVOID lpAddress, MemoryPatch mp) {
         return false;
     }
 
+    return true;
+}
+
+
+bool IsBadReadPtr(HANDLE hProcess, LPVOID p)
+{
+    MEMORY_BASIC_INFORMATION mbi = { 0 };
+    if (::VirtualQueryEx(hProcess, p, &mbi, sizeof(mbi)))
+    {
+        DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+        bool b = !(mbi.Protect & mask);
+        // check the page is not a guard page
+        if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) b = true;
+
+        return b;
+    }
     return true;
 }

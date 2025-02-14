@@ -133,7 +133,7 @@
     <ClCompile Include="Memory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game_pointers.h" />
+    <ClInclude Include="game_pointers.hpp" />
     <ClInclude Include="HackLogic.hpp" />
     <ClInclude Include="LoopThread.hpp" />
     <ClInclude Include="Memory.h" />
