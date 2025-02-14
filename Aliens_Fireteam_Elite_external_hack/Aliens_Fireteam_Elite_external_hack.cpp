@@ -23,7 +23,7 @@ extern MemoryPatchLoopUnitOfWork godmodeUnitOfWork;
 extern MemoryPatchLoopUnitOfWork instakillUnitOfWork;
 
 bool hack(HANDLE hProcess, uintptr_t baseAddress);
-bool unreal(HANDLE hProcess, LPVOID baseAddress);
+bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem);
 
 
 int g_iMode = 0; // 1 for hack, 2 for sdk
@@ -86,12 +86,15 @@ int main(int argc, char** argv)
         return WIN_ERROR;
     }
 
-    uintptr_t baseAddress = GetModuleBaseAddress(pid, PROCESS_NAME);
+    Mem mem = Mem(hProcess, PROCESS_NAME);
+
+    mem.moduleBaseAddress = Mem::GetModuleBaseAddress(pid, PROCESS_NAME);
+    uintptr_t baseAddress = mem.moduleBaseAddress;
 
     wprintf(L"Found base address of the %s module: %p\n", PROCESS_NAME, baseAddress);
 
     if (g_iMode == 1) {
-        unreal(hProcess, (LPVOID)baseAddress);
+        unreal(hProcess, (LPVOID)baseAddress, &mem);
     }
     else if (g_iMode == 2) {
         return hack(hProcess, baseAddress);
@@ -108,32 +111,31 @@ LPVOID FNamePoolPointerchain[]{
 UINT8 FNamePoolPointerchainSize = 2;
 
 
-bool unreal(HANDLE hProcess, LPVOID baseAddress) {
-    
-    uintptr_t pGObjectsArray = 0x00007FF635937A08;
+bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
+        
+    uintptr_t pGObjectsArray = 0x000000007FF7D5357A08;
     uintptr_t pFnamePool = (uintptr_t)Mem::getDynamicMemoryAddress(hProcess, baseAddress, FNamePoolPointerchain, FNamePoolPointerchainSize);
 
     printf("BaseAddress: %p pFnamePool %p pGObjectsArray %p\n", baseAddress, pFnamePool, pGObjectsArray);
 
-    Mem mem = Mem(hProcess, PROCESS_NAME);
+
     UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
-    sdk.initMem(&mem);
+    sdk.initMem(mem);
+
+
+    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x00000020981D4B680, 0xDDDD,0, 1)) {
+        return false;
+    }
+
+    return true;
 
     if (!UE_SDK::printAllGObjects()) {
         return false;
     }
+    return true;
 
     return true;
 
-    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x0000012B5D9D1C80, 0xDDDD)) {
-        return false;
-    }
-
-    if (!UE_SDK::traverseUObjectForMembersEtc((uintptr_t)0x0000012AF9FCE080, 0xDDDD)) {
-        return false;
-    }
-
-    return true;
 
     /*
     if (!printAllGObjects(hProcess, baseAddress)) {

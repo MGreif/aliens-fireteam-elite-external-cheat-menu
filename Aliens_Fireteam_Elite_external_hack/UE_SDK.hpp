@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include "memory.h"
 #define NAME_LENGTH 256
-
+#define NAME_EMPTY "_"
 class FNamePool
 {
 public:
@@ -35,22 +35,41 @@ public:
     BOOL getName(HANDLE hProcess, UINT64 id, char name[NAME_LENGTH]);
 };
 
-class UObject {
-public:
-    uintptr_t vTable;
-    UINT32 flags;
-    UINT32 internalIndex;
-    uintptr_t pClassPrivate;
-    uintptr_t name;
-    uintptr_t pClassOuter;
-};
 
 
 namespace UE_SDK {
 
+    class UObject {
+    public:
+        uintptr_t vTable;
+        UINT32 flags;
+        UINT32 internalIndex;
+        uintptr_t pClassPrivate;
+        uintptr_t name;
+        uintptr_t pClassOuter;
+        //Own methods
+        bool static isUObject(uintptr_t pTarget);
+        bool findName();
+        char asciiName[NAME_LENGTH] = NAME_EMPTY;
+    };
+
+    class UProperty {
+    public:
+        uintptr_t vTable;
+        uintptr_t pad1;
+        uintptr_t pOwner;
+        UINT64 flags;
+        UINT64 name;
+        //Own methods
+        bool static isUProperty(uintptr_t pTarget);
+        bool findName();
+        char asciiName[NAME_LENGTH] = NAME_EMPTY;
+    };
+
+
     class Remote_SDK {
     public:
-        uintptr_t pGObjectArray, pFNamePool, moduleBaseAddress = NULL;
+        uintptr_t pGObjectArray, pFNamePool = NULL;
         Mem* mem = nullptr;
         Remote_SDK(uintptr_t pGObjectArray, uintptr_t pFNamePool);
         void initMem(Mem* m);
@@ -62,7 +81,7 @@ namespace UE_SDK {
 
 	void init();
     bool printAllFNames(HANDLE hProcess, LPVOID baseAddress);
-    bool traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size);
+    bool traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel);
     bool printFNameForUObjects(uintptr_t* uObjects, size_t size);
     bool printAllGObjects();
 }

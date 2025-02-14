@@ -15,7 +15,6 @@ struct MemoryPatch {
 	uintptr_t address;
 };
 DWORD GetAlienFireteamElitePid();
-uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* moduleName);
 LPVOID getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID* pointerChain, UINT chainLength);
 BOOL writeMemory(HANDLE hProcess, LPVOID baseAddress, LPVOID* pointerChain, UINT8 pointerChainSize, char buffer[], int bufferSize);
 
@@ -28,11 +27,8 @@ public:
     HANDLE hProcess = NULL;
     DWORD processPid = NULL;
     const wchar_t* processName = NULL;
-    Mem(HANDLE _hProcess, const wchar_t* processName) {
-        hProcess = _hProcess;
-        this->processPid = this->GetRemoteProcessPid(processName);
-        this->processName = processName;
-    }
+    uintptr_t moduleBaseAddress = NULL;
+    Mem(HANDLE _hProcess, const wchar_t processName[]);
     template <typename MemType> MemType readRemote(MemType* address) {
         return readRemote(address, sizeof(MemType));
     }
@@ -54,7 +50,7 @@ public:
     LPVOID static getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID* pointerChain, UINT chainLength);
     LPVOID getDynamicMemoryAddress(LPVOID baseAddress, LPVOID* pointerChain, UINT chainLength);
     LPVOID getDynamicMemoryAddress(LPVOID* pointerChain, UINT chainLength);
-    uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t* moduleName);
+    uintptr_t static GetModuleBaseAddress(DWORD pid, const wchar_t moduleName[]);
     DWORD GetRemoteProcessPid(const wchar_t* processName);
     bool static IsBadReadPtr(HANDLE hProcess, LPVOID p);
     bool IsBadReadPtr(LPVOID p);

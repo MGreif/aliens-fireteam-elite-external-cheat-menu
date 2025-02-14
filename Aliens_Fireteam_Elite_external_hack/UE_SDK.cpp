@@ -3,14 +3,85 @@
 #include "UE_SDK.hpp"
 
 #define DEBUG_SDK false
+#define ERROR_TRACE false
 
 namespace UE_SDK {
+    bool UObject::findName() {
+        pSdk->getFName(this->name, this->asciiName);
+        if (strlen(this->asciiName) <= 1) {
+            ERROR_TRACE&& printf("[!] No name found...\n");
+            return false;
+        }
+        return true;
+    }
+    bool UObject::isUObject(uintptr_t pTarget) {
+        bool result = true;
+        UObject* uObject = (UObject*)malloc(sizeof(UObject));
+        DEBUG_SDK&& printf("pTarget: %p, hProcess: %x, moduleBaseAddress: %p\n", pTarget, pSdk->mem->hProcess, (LPVOID)pSdk->mem->moduleBaseAddress);
+        if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uObject, sizeof(UObject), NULL)) {
+            ERROR_TRACE&& printf("[!][isUObject] Could not save UOBject (%p) to %p. Error: %u\n", pTarget, uObject, GetLastError());
+            free(uObject);
+            return false;
+        }
+
+        if (pSdk->mem->IsBadReadPtr((LPVOID)uObject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)uObject->vTable)) {
+            ERROR_TRACE&& printf("[!][isUObject] ClassPrivate (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uObject->pClassPrivate, uObject->vTable, GetLastError());
+            free(uObject);
+            return false;
+        }
+
+        result = uObject->findName();
+
+        free(uObject);
+        return result;
+    }
+
+    bool UProperty::findName() {
+        pSdk->getFName(this->name, this->asciiName);
+        if (strlen(this->asciiName) <= 1) {
+            ERROR_TRACE&& printf("[!] No name found...\n");
+            return false;
+        }
+
+        if (strncmp(this->asciiName, "", 4)) return false;
+
+
+        return true;
+    }
+    bool UProperty::isUProperty(uintptr_t pTarget) {
+        bool result = true;
+
+        UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
+        if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uProperty, sizeof(UProperty), NULL)) {
+            ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", pTarget, uProperty, GetLastError());
+            free(uProperty);
+            return false;
+        }
+
+        if (pSdk->mem->IsBadReadPtr((LPVOID)uProperty->pOwner) || pSdk->mem->IsBadReadPtr((LPVOID)uProperty->vTable)) {
+            ERROR_TRACE&& printf("[!][isUProperty] pOwner (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uProperty->pOwner, uProperty->vTable, GetLastError());
+            free(uProperty);
+            return false;
+        }
+
+        if (uProperty->pOwner == 0x0 && uProperty->vTable == 0x0 && uProperty->name == 0x0) {
+            ERROR_TRACE&& printf("[!][isUProperty] is empty\n");
+            return false;
+        }
+
+        result = uProperty->findName();
+        if (strncmp(uProperty->asciiName, NAME_EMPTY, sizeof(NAME_EMPTY)) == 0) {
+            return false;
+        }
+        return result;
+    }
+
 
     BOOL UE_SDK::Remote_SDK::getFName(UINT64 id, char* out) {
         UINT16 chunkId = id >> 16;
         DEBUG_SDK && printf("[%x] Chunk: %u, pFNamePool: %p\n", id, chunkId, pFNamePool);
 
-        void* pChunk = RemoteMem().read<void*>(pSdk->mem->hProcess, (void**)pFNamePool);
+        void* pChunk = (void*)pFNamePool; //RemoteMem().read<void*>(pSdk->mem->hProcess, (void**)pFNamePool);
 
         DEBUG_SDK && printf("[nameIndex: %x] ChunkId: %d pChunk: %p result: %p\n", id, chunkId, pChunk, (uintptr_t)pChunk + (uintptr_t)0x10 + (uintptr_t)chunkId * 8);
 
@@ -29,7 +100,7 @@ namespace UE_SDK {
         char tempName[NAME_LENGTH] = { 0 };
 
         if (!ReadProcessMemory(pSdk->mem->hProcess, pName, tempName, NAME_LENGTH, NULL)) {
-            printf("[!] Could not read memory! Error: %u\n", GetLastError());
+            ERROR_TRACE && printf("[!][Get-Temp-Name] Could not read memory! Error: %u\n", GetLastError());
             return false;
         }
 
@@ -69,42 +140,19 @@ namespace UE_SDK {
 
         memcpy(out, (char*)tempName + skip, strlen(tempName));
         if (strlen(out) == 0) {
-            printf("[!] Not found: id:%u chunkId:%u pChunk:%p pFname: %p\n", id, chunkId, chunk, pName);
+            ERROR_TRACE&& printf("[!][Get-Name] Not found: id:%u chunkId:%u pChunk:%p pFname: %p\n", id, chunkId, chunk, pName);
         }
         DEBUG_SDK && printf("Name: %s\n", out);
         return true;
     }
-
-
-
-
-
     UE_SDK::Remote_SDK::Remote_SDK(uintptr_t pGObjects, uintptr_t pFNamePool) {
         this->pGObjectArray = pGObjects;
         this->pFNamePool = pFNamePool;
         pSdk = this;
     }
-
     void UE_SDK::Remote_SDK::initMem(Mem* mem) {
         this->mem = mem;
-        this->moduleBaseAddress = mem->GetModuleBaseAddress(mem->processPid, mem->processName);
     }
-
-
-
-    bool UE_SDK::printAllFNames(HANDLE hProcess, LPVOID baseAddress) {
-        char name[NAME_LENGTH] = { 0 };
-
-        if (!pSdk->getFName((UINT64)0x00061299, name)) {
-            printf("Could not get id: %x", 0x00061299);
-        }
-
-
-
-        return true;
-    }
-
-
     UINT64 UE_SDK::Remote_SDK::getFNameForUObject(uintptr_t uObject, char name[NAME_LENGTH]) {
         auto current = uObject;
         if (current < 0xFFFFFF || current > 0x7FF000000000) return 0;
@@ -120,7 +168,7 @@ namespace UE_SDK {
             return 0;
         }
 
-        DEBUG_SDK&&  printf("Found nameIndex: %p at: %p\n", nameIndex, (UINT64*)((char*)current + 0x18));
+        DEBUG_SDK&& printf("Found nameIndex: %p at: %p\n", nameIndex, (UINT64*)((char*)current + 0x18));
 
         pSdk->getFName(nameIndex, name);
 
@@ -129,83 +177,136 @@ namespace UE_SDK {
     }
 
 
-    bool UE_SDK::traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size) {
+
+    bool UE_SDK::printAllFNames(HANDLE hProcess, LPVOID baseAddress) {
+        char name[NAME_LENGTH] = { 0 };
+
+        if (!pSdk->getFName((UINT64)0x00061299, name)) {
+            ERROR_TRACE&& printf("[!][Get-Name] Could not get id: %x", 0x00061299);
+        }
+
+
+
+        return true;
+    }
+
+    bool UE_SDK::traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel) {
+        if (level == maxLevel) return true;
         UObject* pUOBject = (UObject*)malloc(size);
+        memset(pUOBject, 0, size);
+
+        DEBUG_SDK&& printf("Reading _pUOBject %p into pUOBject %p (heap)\n", _pUObject, pUOBject);
+
 
         if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)_pUObject, (LPVOID)pUOBject, size, NULL)) {
-            printf("[!] Could not read memory (0x%p)\n", _pUObject);
+            ERROR_TRACE&& printf("[!][Read-UObject] Could not read memory (0x%p)\n", _pUObject);
             return false;
         }
+        DEBUG_SDK&& printf("Saved _pUOBject %p into pUOBject %p (heap)\n", _pUObject, pUOBject);
+        DEBUG_SDK&& printf("Getting name for UOBject %p. Name index: %x\n", _pUObject, pUOBject->name);
 
         // Assert that UObject points to a valid UObject
         char UObjectName[NAME_LENGTH] = { 0 };
         if (!pSdk->getFName(pUOBject->name, UObjectName)) {
-            printf("[!] Could not get name for uobject (0x%p)!\n", _pUObject);
+            ERROR_TRACE&& printf("[!][Get-Name] Could not get name for uobject (0x%p)!\n", _pUObject);
             return false;
         }
+
+        DEBUG_SDK&& printf("Name for UOBject %p: %s\n", _pUObject, UObjectName);
 
 
         if (pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassOuter)) {
-            printf("pClassPrivate (%p) or pClassOuter (%p) is not a valid pointer ....\n", pUOBject->pClassPrivate, pUOBject->pClassOuter);
+            ERROR_TRACE&& printf("[!] pClassPrivate (%p) or pClassOuter (%p) is not a valid pointer ....\n", pUOBject->pClassPrivate, pUOBject->pClassOuter);
             return false;
         }
 
-        printf("[%s]\nFlags: %u\nClassPrivate: %p\nClassOuter: %p\n", UObjectName, pUOBject->flags, pUOBject->pClassPrivate, pUOBject->pClassOuter);
+        printf("[%s]\n", UObjectName);
 
 
         for (int i = sizeof(UObject); i < size; i = i + 8) {
 
             uintptr_t ptr = *reinterpret_cast<uintptr_t*>((uintptr_t)(char*)pUOBject + i);
 
-            if (pSdk->mem->IsBadReadPtr((LPVOID)ptr)) continue;
+            DEBUG_SDK&& printf("Child QWORD (%p) (0x%x)\n", ptr, i);
+
+
+            if (pSdk->mem->IsBadReadPtr((LPVOID)ptr)) {
+                ERROR_TRACE&& printf("[!] Child QWORD (%p) is not a valid pointer ....\n", ptr);
+                continue;
+            };
 
 
             if (ptr > 0x7FF000000000) {
                 // Function
+
+                for (int i = 0; i < level; i++) {
+                    printf("-");
+                }
+                printf("- [%p] [0x%x] Function\n", ptr, i);
+
             }
-            else {
+            else if (UProperty::isUProperty(ptr)) {
+                
+                UProperty uProperty = UProperty();
+                uProperty.findName();
+                printf("- [%p] [0x%x] [UProperty] %s\n", ptr, i, uProperty.asciiName);
+            }
+            else if (UObject::isUObject(ptr)) {
+                UObject* pChildUOBject = (UObject*)malloc(size);
+                memset(pChildUOBject, 0, size);
+                DEBUG_SDK&& printf("Found UOBject at (%p). Reading UBOject into %p\n", ptr, pChildUOBject);
 
-
-                UObject* pUOBject = (UObject*)malloc(size);
-
-                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)ptr, (LPVOID)pUOBject, size, NULL)) {
+                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)ptr, (LPVOID)pChildUOBject, size, NULL)) {
+                    ERROR_TRACE&& printf("[!][Read-UObject] Could not read pUObject (%p)\n", pChildUOBject);
+                    free(pChildUOBject);
                     continue;
                 }
 
-                if (pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassOuter)) {
+                DEBUG_SDK&& printf("Wrote UOBject (%p) into %p\n", ptr, pChildUOBject);
+
+
+                if (pSdk->mem->IsBadReadPtr((LPVOID)pChildUOBject->pClassPrivate)) {
+                    DEBUG_SDK&& printf("[!][Bad-Pointer] pUOBject pClassPrivate (%p) is a bad pointer\n", pChildUOBject->pClassPrivate);
+                    free(pChildUOBject);
                     continue;
                 }
+
+                DEBUG_SDK&& printf("UOBject (%p) seems to be valid. Getting Name for Index %p\n", ptr, pChildUOBject->name);
 
 
                 // Object/Class
                 char UObjectName[NAME_LENGTH] = { 0 };
-                if (!pSdk->getFName(pUOBject->name, UObjectName)) {
-                    printf("[!] Could not get name for uobject!\n");
+                if (!pSdk->getFName(pChildUOBject->name, UObjectName)) {
+                    ERROR_TRACE&& printf("[!][Get-Name] Could not get name for uobject!\n");
+                    free(pChildUOBject);
                     continue;
                 }
-                printf("-[%p] %s (0x%x)\n", ptr, UObjectName, i);
+
+                DEBUG_SDK&& printf("UOBject (%p) has Name: %s\n", ptr, UObjectName);
+
+
+                for (int i = 0; i < level; i++) {
+                    printf("-");
+                }
+                printf("- [%p] [0x%x] [UObject] %s\n", ptr, i, UObjectName);
 
 
                 uintptr_t child = { 0 };
 
-                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)((char*)_pUObject + i), &child, sizeof(uintptr_t), NULL)) {
-                    continue;
-                }
+                //if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)((char*)_pUObject + i), &child, sizeof(uintptr_t), NULL)) {
+                //    ERROR_TRACE&& printf("Could not read child UOBject %p\n", (char*)_pUObject + i);
+                //    continue;
+                //}
+                DEBUG_SDK&& printf("Traversing into (%p)\n", ptr);
+                free(pChildUOBject);
 
-                //traverseUObjectForMembersEtc(hProcess, baseAddress, child, 0x10);
-                free(pUOBject);
+                traverseUObjectForMembersEtc(ptr, 0xDD, level + 1, maxLevel);
             }
-
-
-
 
         }
 
-
-
         free(pUOBject);
     }
-
 
     bool UE_SDK::printFNameForUObjects(uintptr_t* uObjects, size_t size) {
 
@@ -238,7 +339,7 @@ namespace UE_SDK {
         uintptr_t* GObjectsArray = (uintptr_t*)calloc(arraySize, sizeof(uintptr_t));
 
         if (!ReadProcessMemory(pSdk->mem->hProcess, (char*)pGObjectsController + 0x350, GObjectsArray, arraySize * sizeof(uintptr_t), NULL)) {
-            printf("[!] Could not read memory! Error %u\n", GetLastError());
+            ERROR_TRACE&& printf("[!][Read GOBjects] Could get read GOBjects array! Error %u\n", GetLastError());
             return false;
         }
 

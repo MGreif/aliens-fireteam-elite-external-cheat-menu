@@ -136,8 +136,15 @@ bool Mem::IsBadReadPtr(LPVOID p)
     return Mem::IsBadReadPtr(hProcess, p);
 }
 
+Mem::Mem(HANDLE _hProcess, const wchar_t processName[]) {
 
-uintptr_t Mem::GetModuleBaseAddress(DWORD pid, const wchar_t* moduleName) {
+    hProcess = _hProcess;
+    this->processPid = this->GetRemoteProcessPid(processName);
+    this->processName = processName;
+}
+
+
+uintptr_t Mem::GetModuleBaseAddress(DWORD pid, const wchar_t moduleName[]) {
     MODULEENTRY32 moduleEntry = { sizeof(MODULEENTRY32) };
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
     if (Module32First(snapshot, &moduleEntry)) {
