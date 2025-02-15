@@ -61,6 +61,8 @@ namespace UE_SDK {
         uintptr_t pad2;
         UINT64 flags;
         UINT64 name;
+        char pad[0x28];
+        UProperty* pNext;
         //Own methods
         UProperty(uintptr_t pTarget) {
             this->isUProperty(pTarget);

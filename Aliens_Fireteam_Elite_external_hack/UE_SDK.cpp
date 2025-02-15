@@ -50,7 +50,6 @@ namespace UE_SDK {
     }
     bool UProperty::isUProperty(uintptr_t pTarget) {
         bool result = true;
-        printf("Checking isUProperty for %p\n", pTarget);
         UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
         memset(uProperty, 0, sizeof(uProperty));
         if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uProperty, sizeof(UProperty), NULL)) {
@@ -72,8 +71,14 @@ namespace UE_SDK {
             return false;
         }
 
+
+
         result = uProperty->findName();
 
+        if (strncmp(uProperty->asciiName, "None", 4) == 0) {
+            result = false;
+        }
+        free(uProperty);
         return result;
     }
 
@@ -84,7 +89,7 @@ namespace UE_SDK {
 
         void* pChunk = (void*)pFNamePool; //RemoteMem().read<void*>(pSdk->mem->hProcess, (void**)pFNamePool);
 
-        DEBUG_SDK && printf("[nameIndex: %x] ChunkId: %d pChunk: %p result: %p\n", id, chunkId, pChunk, (uintptr_t)pChunk + (uintptr_t)0x10 + (uintptr_t)chunkId * 8);
+        DEBUG_SDK && printf("[%x] ChunkId: %d pChunk: %p result: %p\n", id, chunkId, pChunk, (uintptr_t)pChunk + (uintptr_t)0x10 + (uintptr_t)chunkId * 8);
 
 
         void* chunk = RemoteMem().read<void*>(pSdk->mem->hProcess, (void**)((char*)pChunk + (char)0x10 + (char)chunkId * 8));
@@ -92,7 +97,7 @@ namespace UE_SDK {
 
 
         UINT64 pFNameEntry = 0x000000000001FFFF & (id * 2);
-        DEBUG_SDK && printf("[%x] nameOffset: %u\n", id, pFNameEntry);
+        DEBUG_SDK && printf("[%x] nameOffset: %p\n", id, pFNameEntry);
 
         char* pName = (char*)((uintptr_t)chunk + (uintptr_t)pFNameEntry);
         DEBUG_SDK && printf("[%x] chunk(%p) + pFNameEntry (%p) + 0x2 = %p\n", id, chunk, pFNameEntry, pName);
@@ -247,17 +252,30 @@ namespace UE_SDK {
 
             }
             else if (UProperty::isUProperty(ptr)) {
+                UProperty* next = (UProperty*)ptr;
+                printf("---");
                 UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
+                do {
+                    DEBUG_SDK&& printf("Next UProperty: %p\n", next);
 
-                memset(uProperty, 0, sizeof(uProperty));
-                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)ptr, uProperty, sizeof(UProperty), NULL)) {
-                    ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", ptr, uProperty, GetLastError());
-                    free(uProperty);
-                    return false;
-                }
+                    memset(uProperty, 0, sizeof(uProperty));
 
-                uProperty->findName();
-                printf("- [%p] [0x%x] [UProperty] %s\n", ptr, i, uProperty->asciiName);
+                    if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)next, uProperty, sizeof(UProperty), NULL)) {
+                        ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", next, uProperty, GetLastError());
+                        free(uProperty);
+                        continue;
+                    }
+
+                    uProperty->findName();
+
+
+                    printf("- [%p] [0x%x] [UProperty] %s\n", next, i, uProperty->asciiName);
+                    next = uProperty->pNext;
+                    DEBUG_SDK&& printf("Next UProperty2: %p\n", next);
+
+                } while (next != nullptr);
+
+                
             }
             else if (UObject::isUObject(ptr)) {
                 UObject* pChildUOBject = (UObject*)malloc(size);
