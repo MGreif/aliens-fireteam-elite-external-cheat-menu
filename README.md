@@ -2,7 +2,7 @@
 
 Architecture: x86_64
 
-OS: Windows
+OS: Windows 
 
 ### Disclaimer
 This project is for educational purposes. I am not responsible for any bans/consequences you might get for using this.
@@ -33,4 +33,3 @@ Features labled with [ingame] should only be activated in an active game. If not
 - Superspeed [ingame]
 
 I am working on more.
-

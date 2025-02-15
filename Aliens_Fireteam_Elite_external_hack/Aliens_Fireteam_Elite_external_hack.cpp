@@ -113,8 +113,20 @@ UINT8 FNamePoolPointerchainSize = 2;
 
 bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
         
-    uintptr_t pGObjectsArray = 0x000000007FF7D5357A08;
     uintptr_t pFnamePool = (uintptr_t)Mem::getDynamicMemoryAddress(hProcess, baseAddress, FNamePoolPointerchain, FNamePoolPointerchainSize);
+    char GObjectsPattern[] = { 0x05, 0x00, 0x05, 0x07, 0xC3, 0x1F, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFE, 0x51, 0x00, 0x00, 0xFD, 0x51, 0x00, 0x00 };
+
+    //05 00 05 07 C3 1F 02 00 00 00 00 00 00 00 00 00 FE 51 00 00 FD 51 00 00
+
+    uintptr_t pGObjectsArray = mem->findPattern(GObjectsPattern, sizeof(GObjectsPattern));
+
+    if (pGObjectsArray > 0) {
+        pGObjectsArray += 0x10;
+    }
+    else {
+        printf("[!][findGOBjects] Could not find GObjects\n");
+        return false;
+    }
 
     printf("BaseAddress: %p pFnamePool %p pGObjectsArray %p\n", baseAddress, pFnamePool, pGObjectsArray);
 

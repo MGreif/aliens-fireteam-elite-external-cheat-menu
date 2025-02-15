@@ -236,3 +236,80 @@ LPVOID Mem::getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID*
 
     return finalAddress;
 }
+
+bool compareArrays(char array1[], char array2[], size_t size) {
+    for (int i = 0; i < size; i++) {
+        bool sameItem = array1[i] == array2[i];
+        bool hasWildcard = array2[i] == '??' || array1[i] == '??';
+        if (!sameItem && !hasWildcard) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Amateur find algo
+UINT64 find(char fullArray[], size_t fullArrayLength, char arrayToFind[], size_t arrayToFindLength, UINT64 offset) {
+    if (offset + arrayToFindLength > fullArrayLength) {
+        return 0;
+    }
+    if (compareArrays(fullArray + offset, arrayToFind, arrayToFindLength)) {
+        printf("FOUND\n");
+        return offset;
+    }
+
+    return find(fullArray, fullArrayLength, arrayToFind, arrayToFindLength, offset + 1);
+}
+
+uintptr_t Mem::findPattern(char pattern[], size_t patternSize) {
+
+    /* // Find test
+    char arr1[] = {0x00, 0x00, 0x12, 0x34, 0x00, 0x56, 0x00};
+    char arr2[] = { 0x12, 0x34, 0x00, 0x56, 0x00};
+    char arr3[] = { 0x12 };
+
+    return find(arr1, 7, arr2, 5, 0);
+    return 0;
+    */
+
+    UINT64 found = NULL;
+    LPCVOID baseAddress = (LPCVOID)moduleBaseAddress;
+
+    do {
+        printf("Base Address: 0x%p Pattern Size: %u\n", baseAddress, patternSize);
+        MEMORY_BASIC_INFORMATION mbi = { 0 };
+        if (!VirtualQueryEx(hProcess, baseAddress, &mbi, sizeof(MEMORY_BASIC_INFORMATION))) {
+            printf("[!][findPattern] Could not VirtualQuery\n");
+            return NULL;
+        }
+
+        if ((mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) > 0) {
+            printf("[!][findPattern] Page not accessible protect: 0x%x\n", mbi.Protect);
+            return NULL;
+        }
+
+
+        char* buffer = (char*)malloc(mbi.RegionSize);
+        memset(buffer, 0, mbi.RegionSize);
+        SIZE_T bytesRead = 0;
+        if (!ReadProcessMemory(hProcess, baseAddress, buffer, mbi.RegionSize, &bytesRead)) {
+            printf("[!][findPattern] Could not read memory (%u bytes) at %p\n", mbi.RegionSize, baseAddress);
+            return false;
+        }
+
+        if (bytesRead == 0) {
+            printf("[!][findPattern] Read no bytes at %p\n", baseAddress);
+            return false;
+        }
+
+        found = find(buffer, mbi.RegionSize, pattern, patternSize, 0);
+        free(buffer);
+        if (!found) baseAddress = (char*)baseAddress + mbi.RegionSize;
+    } while (found == 0);
+
+    if (found) {
+        return (uintptr_t)baseAddress + found;
+    }
+
+    return NULL;
+}

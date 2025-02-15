@@ -54,6 +54,7 @@ public:
     DWORD GetRemoteProcessPid(const wchar_t* processName);
     bool static IsBadReadPtr(HANDLE hProcess, LPVOID p);
     bool IsBadReadPtr(LPVOID p);
+    uintptr_t findPattern(char pattern[], size_t patternSize);
 };
 
 
