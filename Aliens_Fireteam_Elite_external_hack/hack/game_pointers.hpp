@@ -2,7 +2,7 @@
 #ifndef GAME_POINTERS_AFE
 #define GAME_POINTERS_AFE
 
-#include "Memory.h"
+#include "..\Memory.h"
 
 
 //////////////////////// Weapons

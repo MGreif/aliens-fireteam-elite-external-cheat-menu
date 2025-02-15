@@ -34,16 +34,23 @@ public:
     }
     template <typename MemType> MemType readRemote(MemType* address, size_t size) {
         MemType buf = { 0 };
+        readRemote(address, &buf, size);
+        return buf;
+    }
+    template <typename MemType> MemType* readRemote(MemType* address, MemType* buf, size_t size) {
         DWORD oldProtect;
 
         if (IsBadReadPtr(hProcess, address)) {
+            printf("BAD");
             return NULL;
         }
 
-        if (!ReadProcessMemory(hProcess, address, &buf, size, NULL)) {
+        if (!ReadProcessMemory(hProcess, address, buf, size, NULL)) {
+            printf("BAD");
             printf("[!] Could not read memory! Error: %u\n", GetLastError());
             return NULL;
         }
+        printf("%p %p %p\n", address, buf, size);
 
         return buf;
     }

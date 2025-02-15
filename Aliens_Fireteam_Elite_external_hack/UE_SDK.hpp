@@ -16,26 +16,6 @@ public:
     char* chunks[1024]; // might be more
 };
 
-class FNameEntry {
-public:
-    UINT16 metadata; // 2 bytes containing length and some other meta
-    char name[]; // Actual string
-
-    const char* __thiscall getName() {
-        return this->name;
-    }
-};
-
-class FNamePoolIntern {
-public:
-    uintptr_t pFNamePool = NULL;
-    FNamePoolIntern(uintptr_t _pFnamePool) {
-        pFNamePool = _pFnamePool;
-    }
-    BOOL getName(HANDLE hProcess, UINT64 id, char name[NAME_LENGTH]);
-};
-
-
 
 namespace UE_SDK {
 
@@ -49,6 +29,7 @@ namespace UE_SDK {
         uintptr_t pClassOuter;
         //Own methods
         bool static isUObject(uintptr_t pTarget);
+        UObject from(UObject* pTarget);
         bool findName();
         char asciiName[NAME_LENGTH] = NAME_EMPTY;
     };
@@ -79,11 +60,14 @@ namespace UE_SDK {
     public:
         uintptr_t pGObjectArray, pFNamePool = NULL;
         Mem* mem = nullptr;
+        UObject** pUObjects;
+        size_t pUObjectsSize = 0;
         Remote_SDK(uintptr_t pGObjectArray, uintptr_t pFNamePool);
         void initMem(Mem* m);
 
         BOOL getFName(UINT64 id, char* out);
         UINT64 getFNameForUObject(uintptr_t uObject, char name[NAME_LENGTH]);
+        UObject** buildUObjectArray(size_t amount);
     };
     inline Remote_SDK* pSdk;
 
@@ -91,7 +75,6 @@ namespace UE_SDK {
     bool printAllFNames(HANDLE hProcess, LPVOID baseAddress);
     bool traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel);
     bool printFNameForUObjects(uintptr_t* uObjects, size_t size);
-    bool printAllGObjects();
 }
 
 

@@ -9,8 +9,8 @@
 
 #include "Memory.h"
 #include <stdio.h>
-#include "LoopThread.hpp"
-#include "HackLogic.hpp"
+#include "hack\LoopThread.hpp"
+#include "hack\HackLogic.hpp"
 
 #define PROCESS_NAME L"Endeavor-Win64-Shipping.exe"
 #define WIN_ERROR 1
@@ -23,7 +23,7 @@ extern MemoryPatchLoopUnitOfWork godmodeUnitOfWork;
 extern MemoryPatchLoopUnitOfWork instakillUnitOfWork;
 
 bool hack(HANDLE hProcess, uintptr_t baseAddress);
-bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem);
+bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem);
 
 
 int g_iMode = 0; // 1 for hack, 2 for sdk
@@ -51,7 +51,6 @@ void printUsage(bool bClearScreenBefore) {
 
 int main(int argc, char** argv)
 {
-    UE_SDK::init();
     if (argc < 2) {
         printf("usage: hack.exe {sdk,hack}");
         return false;
@@ -78,8 +77,6 @@ int main(int argc, char** argv)
         std::cout << "Found process. ID: " << pid << std::endl;
     }
 
-    std::cout << "Starting hack ...." << std::endl;
-
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
     if (!hProcess) {
         std::cout << "Could not get process ..." << std::endl;
@@ -94,7 +91,7 @@ int main(int argc, char** argv)
     wprintf(L"Found base address of the %s module: %p\n", PROCESS_NAME, baseAddress);
 
     if (g_iMode == 1) {
-        unreal(hProcess, (LPVOID)baseAddress, &mem);
+        sdk(hProcess, (LPVOID)baseAddress, &mem);
     }
     else if (g_iMode == 2) {
         return hack(hProcess, baseAddress);
@@ -111,17 +108,15 @@ LPVOID FNamePoolPointerchain[]{
 UINT8 FNamePoolPointerchainSize = 2;
 
 
-bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
+bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
         
-    uintptr_t pFnamePool = (uintptr_t)Mem::getDynamicMemoryAddress(hProcess, baseAddress, FNamePoolPointerchain, FNamePoolPointerchainSize);
+    uintptr_t pFnamePool = (uintptr_t)mem->getDynamicMemoryAddress(FNamePoolPointerchain, FNamePoolPointerchainSize);
     char GObjectsPattern[] = { 0x05, 0x00, 0x05, 0x07, 0xC3, 0x1F, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFE, 0x51, 0x00, 0x00, 0xFD, 0x51, 0x00, 0x00 };
-
-    //05 00 05 07 C3 1F 02 00 00 00 00 00 00 00 00 00 FE 51 00 00 FD 51 00 00
 
     uintptr_t pGObjectsArray = mem->findPattern(GObjectsPattern, sizeof(GObjectsPattern));
 
     if (pGObjectsArray > 0) {
-        pGObjectsArray += 0x10;
+        pGObjectsArray += 0x10; // Add AOB scan offset for correct address
     }
     else {
         printf("[!][findGOBjects] Could not find GObjects\n");
@@ -134,16 +129,21 @@ bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
     UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
     sdk.initMem(mem);
 
+    sdk.buildUObjectArray(10);
+
+    printf("Size: %u\n", sdk.pUObjectsSize);
+
+    for (int i = 0; i < sdk.pUObjectsSize; i++) {
+        printf("ptr %p\n", sdk.pUObjects[i]);
+    }
+
+    return true;
 
     if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x0020893B40010, 0x1111,0, 2)) {
         return false;
     }
 
-    return true;
 
-    if (!UE_SDK::printAllGObjects()) {
-        return false;
-    }
     return true;
 
     return true;

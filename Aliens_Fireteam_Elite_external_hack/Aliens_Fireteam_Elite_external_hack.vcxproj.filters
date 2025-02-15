@@ -13,18 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\hack">
+      <UniqueIdentifier>{0afb4af4-a03e-43d0-9a38-1308845c1616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hack">
+      <UniqueIdentifier>{17a418d5-5604-4346-9658-f02927a48364}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Aliens_Fireteam_Elite_external_hack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoopThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HackLogic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UE_SDK.hpp">
@@ -33,19 +30,28 @@
     <ClCompile Include="UE_SDK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Aliens_Fireteam_Elite_external_hack.cpp">
+      <Filter>Source Files\hack</Filter>
+    </ClCompile>
+    <ClCompile Include="hack\HackLogic.cpp">
+      <Filter>Source Files\hack</Filter>
+    </ClCompile>
+    <ClCompile Include="hack\LoopThread.cpp">
+      <Filter>Source Files\hack</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game_pointers.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="hack\game_pointers.hpp">
+      <Filter>Header Files\hack</Filter>
     </ClInclude>
-    <ClInclude Include="LoopThread.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="hack\HackLogic.hpp">
+      <Filter>Header Files\hack</Filter>
     </ClInclude>
-    <ClInclude Include="HackLogic.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="hack\LoopThread.hpp">
+      <Filter>Header Files\hack</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

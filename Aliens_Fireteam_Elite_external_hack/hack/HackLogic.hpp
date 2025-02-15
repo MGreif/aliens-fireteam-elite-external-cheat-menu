@@ -2,7 +2,7 @@
 #ifndef AFE_HackLogic
 #define AFE_HackLogic
 
-#include "Memory.h"
+#include "..\Memory.h"
 
 // Ammunition
 BOOL setPrimaryMagazine(HANDLE hProcess, LPVOID baseAddress);

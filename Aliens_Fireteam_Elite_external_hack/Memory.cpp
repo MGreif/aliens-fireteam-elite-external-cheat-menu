@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #define PROCESS_NAME L"Endeavor-Win64-Shipping.exe"
-#define DEBUG_AFE false
+#define DEBUG_AFE true
 
 uintptr_t GetModuleBaseAddress(DWORD pid, const wchar_t moduleName[]) {
     MODULEENTRY32 moduleEntry = { sizeof(MODULEENTRY32) };
@@ -180,7 +180,7 @@ LPVOID Mem::getDynamicMemoryAddress(LPVOID baseAddress, LPVOID* pointerChain, UI
 }
 
 LPVOID Mem::getDynamicMemoryAddress(LPVOID* pointerChain, UINT chainLength) {
-    return Mem::getDynamicMemoryAddress((LPVOID)GetModuleBaseAddress(processPid, processName), pointerChain, chainLength);
+    return Mem::getDynamicMemoryAddress((LPVOID)moduleBaseAddress, pointerChain, chainLength);
 }
 
 // Used to dereference a pointer chain
@@ -254,7 +254,6 @@ UINT64 find(char fullArray[], size_t fullArrayLength, char arrayToFind[], size_t
         return 0;
     }
     if (compareArrays(fullArray + offset, arrayToFind, arrayToFindLength)) {
-        printf("FOUND\n");
         return offset;
     }
 
@@ -276,7 +275,6 @@ uintptr_t Mem::findPattern(char pattern[], size_t patternSize) {
     LPCVOID baseAddress = (LPCVOID)moduleBaseAddress;
 
     do {
-        printf("Base Address: 0x%p Pattern Size: %u\n", baseAddress, patternSize);
         MEMORY_BASIC_INFORMATION mbi = { 0 };
         if (!VirtualQueryEx(hProcess, baseAddress, &mbi, sizeof(MEMORY_BASIC_INFORMATION))) {
             printf("[!][findPattern] Could not VirtualQuery\n");

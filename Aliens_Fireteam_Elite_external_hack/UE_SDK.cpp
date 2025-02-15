@@ -36,6 +36,9 @@ namespace UE_SDK {
         free(uObject);
         return result;
     }
+    UObject UObject::from(UObject* pTarget) {
+        UObject obj = pSdk->mem->readRemote(pTarget);
+    }
 
     bool UProperty::findName() {
         pSdk->getFName(this->name, this->asciiName);
@@ -84,6 +87,17 @@ namespace UE_SDK {
 
 
     BOOL UE_SDK::Remote_SDK::getFName(UINT64 id, char* out) {
+
+        if (id == NULL) {
+            ERROR_TRACE&& printf("[!] Not able to get nameindex!\n");
+            return false;
+        }
+
+        if (id > 0xFFFFFFF) {
+            ERROR_TRACE&& printf("[!] NameIndex too big!\n");
+            return false;
+        }
+
         UINT16 chunkId = id >> 16;
         DEBUG_SDK && printf("[%x] Chunk: %u, pFNamePool: %p\n", id, chunkId, pFNamePool);
 
@@ -164,15 +178,6 @@ namespace UE_SDK {
         if (current < 0xFFFFFF || current > 0x7FF000000000) return 0;
         DEBUG_SDK&& printf("UObject at : %p\n", current);
         UINT64 nameIndex = RemoteMem().read<UINT64>(mem->hProcess, (UINT64*)((char*)current + 0x18));
-        if (nameIndex == NULL) {
-            //  printf("[!] Not able to get nameindex!\n");
-            return 0;
-        }
-
-        if (nameIndex > 0xFFFFFFF) {
-            //  printf("[!] NameIndex too big!\n");
-            return 0;
-        }
 
         DEBUG_SDK&& printf("Found nameIndex: %p at: %p\n", nameIndex, (UINT64*)((char*)current + 0x18));
 
@@ -182,7 +187,28 @@ namespace UE_SDK {
         return nameIndex;
     }
 
+    UObject** Remote_SDK::buildUObjectArray(size_t amount) {
+        UObject** valids = (UObject**)calloc(amount, sizeof(UObject*));
+        UObject** temp = (UObject**)calloc(amount, sizeof(UObject*));
+        printf("Reading %p\n", pGObjectArray);
+        mem->readRemote<UObject*>((UObject**)pGObjectArray, temp, amount * sizeof(UObject*));
 
+        UINT32 validCount = 0;
+        for (int i = 0; i < amount; i++) {
+            printf("AAA %p\n", temp[i]);
+            if (temp[i] == nullptr) {
+                continue;
+            }
+            UObject* pUObject = temp[i];
+            if (!mem->IsBadReadPtr(pUObject)) {
+                valids[validCount++] = pUObject;
+            }
+        }
+        free(temp);
+        pUObjects = valids;
+        pUObjectsSize = validCount;
+        return valids;
+    }
 
     bool UE_SDK::printAllFNames(HANDLE hProcess, LPVOID baseAddress) {
         char name[NAME_LENGTH] = { 0 };
@@ -360,28 +386,4 @@ namespace UE_SDK {
         return true;
     }
 
-
-    bool UE_SDK::printAllGObjects() {
-        //LPVOID addr = getDynamicMemoryAddress(hProcess, baseAddressDataCollector, GObjectsPointerchain, GObjectsPointerchainSize);
-
-        const size_t arraySize = 800000;
-        uintptr_t pGObjectsController = 0x00007FF7D5357A08;
-
-        printf("addr: %p hProcess: %p\n", (char*)pGObjectsController + 0x350, pSdk->mem->hProcess);
-        uintptr_t* GObjectsArray = (uintptr_t*)calloc(arraySize, sizeof(uintptr_t));
-
-        if (!ReadProcessMemory(pSdk->mem->hProcess, (char*)pGObjectsController + 0x350, GObjectsArray, arraySize * sizeof(uintptr_t), NULL)) {
-            ERROR_TRACE&& printf("[!][Read GOBjects] Could get read GOBjects array! Error %u\n", GetLastError());
-            return false;
-        }
-
-        return UE_SDK::printFNameForUObjects(GObjectsArray, arraySize);
-    }
-
-
-
-
-    void UE_SDK::init() {
-        printf("hello");
-    }
 }
