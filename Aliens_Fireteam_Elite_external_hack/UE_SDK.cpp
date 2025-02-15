@@ -226,7 +226,7 @@ namespace UE_SDK {
             return false;
         }
 
-        DEBUG_SDK&& printf("[%s]\n", UObjectName);
+        printf("[%s]\n", UObjectName);
 
 
         for (int i = 0x20; i < size; i = i + 8) {
@@ -253,7 +253,6 @@ namespace UE_SDK {
             }
             else if (UProperty::isUProperty(ptr)) {
                 UProperty* next = (UProperty*)ptr;
-                printf("---");
                 UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
                 do {
                     DEBUG_SDK&& printf("Next UProperty: %p\n", next);
@@ -263,16 +262,23 @@ namespace UE_SDK {
                     if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)next, uProperty, sizeof(UProperty), NULL)) {
                         ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", next, uProperty, GetLastError());
                         free(uProperty);
+                        next = nullptr;
                         continue;
                     }
 
                     uProperty->findName();
 
+                    if (next && next != (UProperty*)ptr) {
+                        printf("---");
+                    }
+                    printf("- [%p] [0x%x] [UProperty] %s (class-offset 0x%x)\n", next, i, uProperty->asciiName, uProperty->Internal_offset);
+                    if (next == uProperty->pNext) {
+                        break;
+                    }
 
-                    printf("- [%p] [0x%x] [UProperty] %s\n", next, i, uProperty->asciiName);
                     next = uProperty->pNext;
-                    DEBUG_SDK&& printf("Next UProperty2: %p\n", next);
 
+                    DEBUG_SDK&& printf("Next UProperty2: %p\n", next);
                 } while (next != nullptr);
 
                 
@@ -326,7 +332,7 @@ namespace UE_SDK {
                 DEBUG_SDK&& printf("Traversing into (%p)\n", ptr);
                 free(pChildUOBject);
 
-                traverseUObjectForMembersEtc(ptr, 0xDD, level + 1, maxLevel);
+                traverseUObjectForMembersEtc(ptr, 0x1111, level + 1, maxLevel);
             }
 
         }

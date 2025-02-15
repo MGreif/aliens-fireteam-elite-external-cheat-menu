@@ -123,7 +123,7 @@ bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
     sdk.initMem(mem);
 
 
-    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x02085F3AB800, 0x1000,0, 1)) {
+    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x0020893B40010, 0x1111,0, 2)) {
         return false;
     }
 
@@ -136,20 +136,6 @@ bool unreal(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
 
     return true;
 
-
-    /*
-    if (!printAllGObjects(hProcess, baseAddress)) {
-        return false;
-    }
-
-    return true;
-
-    if (printAllFNames(hProcess, baseAddress)) {
-        printf("[!]Failed printing all names!\n");
-        return false;
-    }
-    return true;
-    */
 }
 
 
