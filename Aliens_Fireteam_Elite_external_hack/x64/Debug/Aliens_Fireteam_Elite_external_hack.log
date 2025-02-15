@@ -1,8 +1,0 @@
-﻿  Aliens_Fireteam_Elite_external_hack.cpp
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(30,53): warning C4311: 'type cast': pointer truncation from 'LPVOID' to 'int'
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(30,53): warning C4302: 'type cast': truncation from 'LPVOID' to 'int'
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(31,39): warning C4311: 'type cast': pointer truncation from 'LPVOID' to 'int'
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(31,39): warning C4302: 'type cast': truncation from 'LPVOID' to 'int'
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(48,23): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack\Aliens_Fireteam_Elite_external_hack.cpp(48,23): warning C4309: 'initializing': truncation of constant value
-  Aliens_Fireteam_Elite_external_hack.vcxproj -> C:\Users\mikag\source\repos\Aliens_Fireteam_Elite_external_hack\x64\Debug\Aliens_Fireteam_Elite_external_hack.exe
