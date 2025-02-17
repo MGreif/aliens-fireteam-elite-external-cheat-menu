@@ -16,23 +16,28 @@ namespace UE_SDK {
     }
     bool UObject::isUObject(uintptr_t pTarget) {
         bool result = true;
-        UObject* uObject = (UObject*)malloc(sizeof(UObject));
-        uObject->from((UObject*)pTarget);
-        UObject empty = { 0 };
+        debug("Getting UObject for %p\n", pTarget);
+        UObject uObject = UObject::from((UObject*)pTarget);
 
-        if (memcmp(uObject, &empty,sizeof(UObject)) == 0) {
+        if (uObject.isEmpty()) {
             error_trace("isUObject", "Could not instantiate UObject\n");
             return false;
         }
 
-        if (pSdk->mem->IsBadReadPtr((LPVOID)uObject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)uObject->vTable)) {
-            error_trace("isUObject", "ClassPrivate (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uObject->pClassPrivate, uObject->vTable, GetLastError());
-            free(uObject);
+        if (pSdk->mem->IsBadReadPtr((LPVOID)uObject.pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)uObject.vTable)) {
+            error_trace("isUObject", "ClassPrivate (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uObject.pClassPrivate, uObject.vTable, GetLastError());
             return false;
         }
 
-        free(uObject);
         return result;
+    }
+    bool UObject::isEmpty() {
+        UObject empty = { 0 };
+
+        if (memcmp(this, &empty, sizeof(UObject)) == 0) {
+            return true;
+        }
+        return false;
     }
     UObject UObject::from(UObject* pTarget) {
         UObject obj = pSdk->mem->readRemote(pTarget);
@@ -228,6 +233,33 @@ namespace UE_SDK {
         return true;
     }
 
+    BOOL UE_SDK::Remote_SDK::getFullFName(UObject* pUObject, char* out) {
+        char fullName[FULL_NAME_LENGTH] = { 0 };
+        UINT16 namepointer = 0;
+        char delimiter[] = "$";
+        UObject* next = pUObject;
+
+        do {
+            UObject curr = UObject::from(next);
+            if (curr.isEmpty()) {
+                error_trace("GetFullName", "Curr was empty...");
+                return false;
+            }
+            int nameLen = strlen(curr.asciiName);
+            debug("Name: %s, len: %u\n", curr.asciiName, nameLen);
+            strncpy_s(fullName + namepointer, FULL_NAME_LENGTH-namepointer, curr.asciiName, nameLen);
+            debug("Fullname: %s, len: %u\n", fullName, strlen(fullName));
+
+            namepointer += nameLen;
+
+            memcpy(fullName + namepointer, delimiter, 1);
+            namepointer += 1;
+            next = (UObject*)curr.pClassOuter;
+        } while (next != nullptr);
+        strncpy_s(out, FULL_NAME_LENGTH, fullName, _TRUNCATE);
+        return true;
+    }
+
     bool UE_SDK::traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel) {
         if (level == maxLevel) return true;
         UObject* pUOBject = (UObject*)malloc(size);
@@ -300,6 +332,7 @@ namespace UE_SDK {
 
                     uProperty->findName();
 
+
                     if (next && next != (UProperty*)ptr) {
                         printf("---");
                     }
@@ -314,43 +347,25 @@ namespace UE_SDK {
                 
             }
             if (UObject::isUObject(ptr)) {
-                UObject* pChildUOBject = (UObject*)malloc(size);
-                memset(pChildUOBject, 0, size);
-                debug("Found UOBject at (%p). Reading UBOject into %p\n", ptr, pChildUOBject);
-
-                if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)ptr, (LPVOID)pChildUOBject, size, NULL)) {
-                    ERROR_TRACE&& printf("[!][Read-UObject] Could not read pUObject (%p)\n", pChildUOBject);
-                    free(pChildUOBject);
-                    continue;
-                }
-
-                debug("Wrote UOBject (%p) into %p\n", ptr, pChildUOBject);
-
-
-                if (pSdk->mem->IsBadReadPtr((LPVOID)pChildUOBject->pClassPrivate)) {
-                    error_trace("traverseUObjectForMembersEtc","pUOBject pClassPrivate (%p) is a bad pointer\n", pChildUOBject->pClassPrivate);
-                    free(pChildUOBject);
-                    continue;
-                }
-
-                debug("UOBject (%p) seems to be valid. Getting Name for Index %p\n", ptr, pChildUOBject->name);
-
-
                 // Object/Class
-                char UObjectName[NAME_LENGTH] = { 0 };
-                if (!pSdk->getFName(pChildUOBject->name, UObjectName)) {
-                    error_trace("traverseUObjectForMembersEtc", "Could not get name for uobject!\n");
-                    free(pChildUOBject);
+
+                UObject ChildUOBject = UObject::from((UObject*)ptr);
+
+
+                if (pSdk->mem->IsBadReadPtr((LPVOID)ChildUOBject.pClassPrivate)) {
+                    error_trace("traverseUObjectForMembersEtc","pUOBject pClassPrivate (%p) is a bad pointer\n", ChildUOBject.pClassPrivate);
                     continue;
                 }
 
-                debug("UOBject (%p) has Name: %s\n", ptr, UObjectName);
+                debug("UOBject (%p) has Name: %s\n", ptr, ChildUOBject.asciiName);
 
+                char fullname[FULL_NAME_LENGTH] = { 0 };
+                pSdk->getFullFName((UObject*)ptr, fullname);
 
                 for (int i = 0; i < level; i++) {
                     printf("-");
                 }
-                printf("- [%p] [0x%x] [UObject] %s\n", ptr, i, UObjectName);
+                printf("- [%p] [0x%x] [UObject] %s ~ %s\n", ptr, i, ChildUOBject.asciiName, fullname);
 
 
                 uintptr_t child = { 0 };
@@ -359,9 +374,6 @@ namespace UE_SDK {
                 //    ERROR_TRACE&& printf("Could not read child UOBject %p\n", (char*)_pUObject + i);
                 //    continue;
                 //}
-                debug("Traversing into (%p)\n", ptr);
-                free(pChildUOBject);
-
                 traverseUObjectForMembersEtc(ptr, 0x1111, level + 1, maxLevel);
             }
 

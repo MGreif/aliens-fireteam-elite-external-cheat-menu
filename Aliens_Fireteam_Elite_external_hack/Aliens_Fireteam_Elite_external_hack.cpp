@@ -146,7 +146,7 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
     UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
     sdk.initMem(mem);
 
-    sdk.buildUObjectArray(500000);
+    sdk.buildUObjectArray(1000000);
     info("Initialized GOBjects with %u objects\n", sdk.pUObjectsSize);
 
 
@@ -182,12 +182,19 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
             printSDKUsage();
             return WIN_ERROR;
         }
-            info("[pointer] [string]\n");
+            info("[pointer] [name] [fullname]\n");
 
         for (int i = 0; i < sdk.pUObjectsSize; i++) {
             UE_SDK::UObject obj = UE_SDK::UObject::from(sdk.pUObjects[i]);
             if (strncmp(obj.asciiName, argv[3], strlen(argv[3])) == 0) {
-                info("[%p] [%s]\n", sdk.pUObjects[i], obj.asciiName);
+                char fullName[FULL_NAME_LENGTH] = { 0 };
+
+                if (!sdk.getFullFName(sdk.pUObjects[i], fullName)) {
+                    error("Could not get full name");
+                    return false;
+                }
+
+                info("[%p] [%s] [%s]\n", sdk.pUObjects[i], obj.asciiName, fullName);
 
             }
         }

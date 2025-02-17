@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include "memory.h"
 #define NAME_LENGTH 256
+#define FULL_NAME_LENGTH 1024
 #define NAME_EMPTY "_"
 class FNamePool
 {
@@ -38,6 +39,7 @@ namespace UE_SDK {
         bool static isUObject(uintptr_t pTarget);
         EType type;
         UObject static from(UObject* pTarget);
+        bool isEmpty();
         bool findName();
         char asciiName[NAME_LENGTH] = NAME_EMPTY;
     };
@@ -78,6 +80,7 @@ namespace UE_SDK {
         void initMem(Mem* m);
 
         BOOL getFName(UINT32 id, char* out);
+        BOOL getFullFName(UObject* pUObject, char* out);
         UINT64 getFNameForUObject(uintptr_t uObject, char name[NAME_LENGTH]);
         UObject** buildUObjectArray(size_t amount);
     };
