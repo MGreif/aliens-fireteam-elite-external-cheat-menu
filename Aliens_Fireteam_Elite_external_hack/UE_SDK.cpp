@@ -585,11 +585,20 @@ namespace UE_SDK {
         if (propertiesOfInnerClass == nullptr) {
             return true;
         }
-        info("Found %u Properties in the base object %p\n", getSizeOfArray(properties), _pUObject);
-        info("Found %u Properties in the classPrivate/innerClass object %p\n", getSizeOfArray(propertiesOfInnerClass), baseObject.pClassPrivate);
-        // todo merge class and classprivate properties together
-        for (int i = 0; i < MAX_PROPERTIES; i++) {
-            UProperty prop = propertiesOfInnerClass[i];
+        UINT64 propertiesOfInnerClassSize = getSizeOfArray(propertiesOfInnerClass);
+        UINT64 propertiesSize = getSizeOfArray(properties);
+
+        info("Found %u Properties in the base object %p\n", propertiesSize, _pUObject);
+        info("Found %u Properties in the classPrivate/innerClass object %p\n", propertiesOfInnerClassSize, baseObject.pClassPrivate);
+
+        UProperty* mergedProperties  = (UProperty*)calloc(MAX_PROPERTIES*2, sizeof(UProperty));
+        memcpy(mergedProperties, properties, propertiesSize * sizeof(UProperty));
+        memcpy(mergedProperties +propertiesSize, propertiesOfInnerClass, propertiesOfInnerClassSize * sizeof(UProperty));
+        free(properties);
+        free(propertiesOfInnerClass);
+
+        for (int i = 0; i < MAX_PROPERTIES*2; i++) {
+            UProperty prop = mergedProperties[i];
             if (prop.isEmpty()) {
                 continue;
             }
@@ -608,8 +617,7 @@ namespace UE_SDK {
             getAllPropertiesForUObject(pPropCarrier, size, level + 1, maxLevel, newPrefix2);
 
         }
-        free(properties);
-        free(propertiesOfInnerClass);
+        free(mergedProperties);
         return true;
     }
 
