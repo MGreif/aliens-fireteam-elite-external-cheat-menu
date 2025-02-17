@@ -1,6 +1,7 @@
 #include "Memory.h"
 #include <iostream>
 #include <stdio.h>
+#include "log.hpp"
 #define PROCESS_NAME L"Endeavor-Win64-Shipping.exe"
 #define DEBUG_AFE true
 
@@ -56,21 +57,20 @@ BOOL writeMemory(HANDLE hProcess, LPVOID baseAddress, LPVOID* pointerChain, UINT
 
 
     if (!VirtualProtectEx(hProcess, address, bufferSize, PAGE_READWRITE, &oldProtect)) {
-        std::cout << "Could not VirtualProtect" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("writeMemory", "Could not virtual protect");
     }
 
     BOOL writeResult = WriteProcessMemory(hProcess, address, buffer, bufferSize, NULL);
 
     if (!writeResult) {
-        std::cout << "Could not write memory" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("writeMemory", "Could not write to memory");
+
     }
 
 
     if (!VirtualProtectEx(hProcess, address, bufferSize, oldProtect, &oldProtect)) {
-        std::cout << "Could not restore VirtualProtect" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("writeMemory", "Could not restore virtual protect");
+
     }
 
     return writeResult;
@@ -84,8 +84,7 @@ BOOL patchMemory(HANDLE hProcess, LPVOID lpAddress, MemoryPatch mp) {
 
 
     if (!ReadProcessMemory(hProcess, lpAddress, mp.originalCode, mp.size, 0)) {
-        std::cout << "Could not read original code in memory" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("patch", "Could not read original code in memory");
         return false;
     }
 
@@ -93,22 +92,19 @@ BOOL patchMemory(HANDLE hProcess, LPVOID lpAddress, MemoryPatch mp) {
     DWORD oldProtect;
 
     if (!VirtualProtectEx(hProcess, lpAddress, mp.size, PAGE_READWRITE, &oldProtect)) {
-        std::cout << "Could not change page permissions" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("patch", "Could not change page permissions");
         return false;
     }
 
 
     if (!WriteProcessMemory(hProcess, lpAddress, mp.patchCode, mp.size, 0)) {
-        std::cout << "Could not write process memory" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("patch", "Could not write process memory");
         return false;
     }
 
 
     if (!VirtualProtectEx(hProcess, lpAddress, mp.size, oldProtect, &oldProtect)) {
-        std::cout << "Could not change page permissions back to original" << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("patch", "Could not change page permissions back to original");
         return false;
     }
 
@@ -196,31 +192,30 @@ LPVOID Mem::getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID*
         return pointerChain[0];
     }
 
-    DEBUG_AFE&& std::cout << "First chain element: " << pointerChain[0] << std::endl;
-    DEBUG_AFE&& std::cout << "Module base: " << baseAddress << std::endl;
-    DEBUG_AFE&& std::cout << "intermediatPointerBuffer: " << intermediaryPointerBuffer << std::endl;
+    debug("First chain element: %p\n", pointerChain[0]);
+    debug("Module base: %p\n", baseAddress);
+    debug("intermediatPointerBuffer: %p\n", intermediaryPointerBuffer);
 
 
-    DEBUG_AFE&& std::cout << "Reading initial base: " << base << std::endl;
+    debug("Reading initial base: %p\n", base);
 
     if (!ReadProcessMemory(hProcess, base, &intermediaryPointerBuffer, sizeof(uintptr_t), NULL)) {
-        std::cout << "Could not read memory, aborting ...." << std::endl;
-        std::cout << GetLastError() << std::endl;
+        error_trace("getDynamicMemoryAddress", "Could not read memory, aborting ....");
         return 0;
     }
 
-    DEBUG_AFE&& printf("Base pointer: %p\n", intermediaryPointerBuffer);
+    debug("Base pointer: %p\n", intermediaryPointerBuffer);
     // Leave out the first and last entry. The first is instantly dereferenced and the last is not dereferenced
     for (int i = 1; i < arraylength - 1; i++) {
 
 
 
-        DEBUG_AFE&& printf("pointer: %p\n", intermediaryPointerBuffer);
+        debug("pointer: %p\n", intermediaryPointerBuffer);
 
         LPVOID newPointer = LPVOID((uintptr_t)intermediaryPointerBuffer + (uintptr_t)pointerChain[i]);
-        DEBUG_AFE&& printf("Dereferencing pointer at level %d: %p \n", i, intermediaryPointerBuffer);
+        debug("Dereferencing pointer at level %d: %p \n", i, intermediaryPointerBuffer);
 
-        DEBUG_AFE&& printf("Adding offset: %p + %x -> %p\n", intermediaryPointerBuffer, (int)pointerChain[i], newPointer);
+        debug("Adding offset: %p + %x -> %p\n", intermediaryPointerBuffer, (int)pointerChain[i], newPointer);
 
         if (!ReadProcessMemory(hProcess, newPointer, &intermediaryPointerBuffer, sizeof(intermediaryPointerBuffer), NULL)) {
             std::cout << "Could not read memory, aborting ...." << std::endl;
@@ -232,12 +227,12 @@ LPVOID Mem::getDynamicMemoryAddress(HANDLE hProcess, LPVOID baseAddress, LPVOID*
 
     LPVOID finalAddress = LPVOID((uintptr_t)intermediaryPointerBuffer + (uintptr_t)pointerChain[arraylength - 1]);
 
-    DEBUG_AFE&& printf("Final result: %p\n", finalAddress);
+    debug("Final result: %p\n", finalAddress);
 
     return finalAddress;
 }
 
-bool compareArrays(char array1[], char array2[], size_t size) {
+constexpr bool compareArrays(char array1[], char array2[], size_t size) {
     for (int i = 0; i < size; i++) {
         bool sameItem = array1[i] == array2[i];
         bool hasWildcard = array2[i] == '??' || array1[i] == '??';
@@ -249,15 +244,16 @@ bool compareArrays(char array1[], char array2[], size_t size) {
 }
 
 // Amateur find algo
-UINT64 find(char fullArray[], size_t fullArrayLength, char arrayToFind[], size_t arrayToFindLength, UINT64 offset) {
-    if (offset + arrayToFindLength > fullArrayLength) {
-        return 0;
+UINT64 find(char fullArray[], size_t fullArrayLength, char arrayToFind[], size_t arrayToFindLength) {
+    for (int i = 0; i < fullArrayLength; i++) {
+        if (i + arrayToFindLength > fullArrayLength) {
+            return 0;
+        }
+        if (compareArrays(fullArray + i, arrayToFind, arrayToFindLength)) {
+            return i;
+        }
     }
-    if (compareArrays(fullArray + offset, arrayToFind, arrayToFindLength)) {
-        return offset;
-    }
-
-    return find(fullArray, fullArrayLength, arrayToFind, arrayToFindLength, offset + 1);
+    return 0;
 }
 
 uintptr_t Mem::findPattern(char pattern[], size_t patternSize) {
@@ -300,7 +296,9 @@ uintptr_t Mem::findPattern(char pattern[], size_t patternSize) {
             return false;
         }
 
-        found = find(buffer, mbi.RegionSize, pattern, patternSize, 0);
+
+
+        found = find(buffer, mbi.RegionSize, pattern, patternSize);
         free(buffer);
         if (!found) baseAddress = (char*)baseAddress + mbi.RegionSize;
     } while (found == 0);

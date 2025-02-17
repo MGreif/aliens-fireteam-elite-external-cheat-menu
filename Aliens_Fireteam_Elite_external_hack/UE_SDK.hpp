@@ -25,7 +25,8 @@ namespace UE_SDK {
         UINT32 flags;
         UINT32 internalIndex;
         uintptr_t pClassPrivate;
-        uintptr_t name;
+        UINT32 name;
+        UINT32 pad1;
         uintptr_t pClassOuter;
         //Own methods
         bool static isUObject(uintptr_t pTarget);
@@ -65,7 +66,7 @@ namespace UE_SDK {
         Remote_SDK(uintptr_t pGObjectArray, uintptr_t pFNamePool);
         void initMem(Mem* m);
 
-        BOOL getFName(UINT64 id, char* out);
+        BOOL getFName(UINT32 id, char* out);
         UINT64 getFNameForUObject(uintptr_t uObject, char name[NAME_LENGTH]);
         UObject** buildUObjectArray(size_t amount);
     };

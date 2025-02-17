@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <iostream>
 #include <TlHelp32.h>
-
+#include "log.hpp"
 
 struct MemoryPatch {
 	char* originalCode;
@@ -41,13 +41,12 @@ public:
         DWORD oldProtect;
 
         if (IsBadReadPtr(hProcess, address)) {
-            printf("BAD");
+            error_trace("readRemote", "Bad pointer: %p\n", address);
             return NULL;
         }
 
         if (!ReadProcessMemory(hProcess, address, buf, size, NULL)) {
-            printf("BAD");
-            printf("[!] Could not read memory! Error: %u\n", GetLastError());
+             error_trace("readRemote", "Could not read memory!");
             return NULL;
         }
         printf("%p %p %p\n", address, buf, size);
@@ -82,7 +81,7 @@ public:
         }
 
         if (!ReadProcessMemory(hProcess, address, &buf, sizeof(MemType), NULL)) {
-            printf("[!] Could not read memory! Error: %u\n", GetLastError());
+            error_trace("read","Could not read memory!");
             return NULL;
         }
 

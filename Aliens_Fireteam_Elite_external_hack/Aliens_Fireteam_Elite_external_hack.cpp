@@ -9,6 +9,7 @@
 
 #include "Memory.h"
 #include <stdio.h>
+#include <sstream>
 #include "hack\LoopThread.hpp"
 #include "hack\HackLogic.hpp"
 
@@ -23,7 +24,7 @@ extern MemoryPatchLoopUnitOfWork godmodeUnitOfWork;
 extern MemoryPatchLoopUnitOfWork instakillUnitOfWork;
 
 bool hack(HANDLE hProcess, uintptr_t baseAddress);
-bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem);
+bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv);
 
 
 int g_iMode = 0; // 1 for hack, 2 for sdk
@@ -49,10 +50,16 @@ void printUsage(bool bClearScreenBefore) {
     printf("0: Exit\n\n\n");
 }
 
+void printSDKUsage() {
+    error("usage: hack.exe {sdk,hack}\n");
+    printf("\thack.exe sdk print-names                             # Prints all GObjects names\n");
+    printf("\thack.exe sdk object-info <address>  <max-levels>     # Prints info about a specified UOBject\n");
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 2) {
-        printf("usage: hack.exe {sdk,hack}");
+        error("usage: hack.exe {sdk,hack}");
         return false;
     }
 
@@ -63,23 +70,24 @@ int main(int argc, char** argv)
         g_iMode = 1;
     }
     else {
-        printf("usage: hack.exe {sdk,hack}");
+        error("usage: hack.exe {sdk,hack}");
         return false;
     }
 
     DWORD pid = GetAlienFireteamElitePid();
 
     if (!pid) {
-        std::cout << "Process not found ..." << std::endl;
+        error("Process not found ...\n");
         return WIN_ERROR;
     }
     else {
-        std::cout << "Found process. ID: " << pid << std::endl;
+        success("Found process.ID: %p\n", pid);
     }
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
     if (!hProcess) {
-        std::cout << "Could not get process ..." << std::endl;
+        error("Could not get process ...\n");
+
         return WIN_ERROR;
     }
 
@@ -91,7 +99,11 @@ int main(int argc, char** argv)
     wprintf(L"Found base address of the %s module: %p\n", PROCESS_NAME, baseAddress);
 
     if (g_iMode == 1) {
-        sdk(hProcess, (LPVOID)baseAddress, &mem);
+        if (argc <= 2) {
+            printSDKUsage();
+            return false;
+        }
+        sdk(hProcess, (LPVOID)baseAddress, &mem, argc, argv);
     }
     else if (g_iMode == 2) {
         return hack(hProcess, baseAddress);
@@ -108,8 +120,8 @@ LPVOID FNamePoolPointerchain[]{
 UINT8 FNamePoolPointerchainSize = 2;
 
 
-bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
-        
+bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
+
     uintptr_t pFnamePool = (uintptr_t)mem->getDynamicMemoryAddress(FNamePoolPointerchain, FNamePoolPointerchainSize);
     char GObjectsPattern[] = { 0x05, 0x00, 0x05, 0x07, 0xC3, 0x1F, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFE, 0x51, 0x00, 0x00, 0xFD, 0x51, 0x00, 0x00 };
 
@@ -119,35 +131,50 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem) {
         pGObjectsArray += 0x10; // Add AOB scan offset for correct address
     }
     else {
-        printf("[!][findGOBjects] Could not find GObjects\n");
+        error("[findGOBjects] Could not find GObjects\n");
         return false;
     }
 
-    printf("BaseAddress: %p pFnamePool %p pGObjectsArray %p\n", baseAddress, pFnamePool, pGObjectsArray);
-
+    debug("BaseAddress: %p pFnamePool %p pGObjectsArray %p\n", baseAddress, pFnamePool, pGObjectsArray);
 
     UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
     sdk.initMem(mem);
 
-    sdk.buildUObjectArray(10);
+    sdk.buildUObjectArray(500000);
+    info("Initialized GOBjects with %u objects\n", sdk.pUObjectsSize);
 
-    printf("Size: %u\n", sdk.pUObjectsSize);
-
-    for (int i = 0; i < sdk.pUObjectsSize; i++) {
-        printf("ptr %p\n", sdk.pUObjects[i]);
+    if (strncmp(argv[2], "print-names", 12) == 0) {
+        info("Printing UOBject names from GOBjects\n");
+        UE_SDK::printFNameForUObjects((uintptr_t*)sdk.pUObjects, sdk.pUObjectsSize);
     }
+    else if (strncmp(argv[2], "object-info", 12) == 0) {
+        char* pUObjectArg = argv[3];
+        UINT8 maxLevel = 1;
+        if (argc < 3 || strlen(pUObjectArg) == 0) {
+            printSDKUsage();
+            return WIN_ERROR;
+        }else if (argc > 4) {
+            if (strlen(argv[4]) == 0) {
+                printSDKUsage();
+                return WIN_ERROR;
+            }
+            maxLevel = atoi(argv[4]);
+            if (maxLevel == 0) {
+                printSDKUsage();
+                return WIN_ERROR;
+            }
+        }
 
-    return true;
-
-    if (!UE_SDK::traverseUObjectForMembersEtc( (uintptr_t)0x0020893B40010, 0x1111,0, 2)) {
+        uintptr_t pUObject = (uintptr_t)std::stoull(pUObjectArg, nullptr, 16);
+        info("Object information for: 0x%p. Max Level: %u\n", pUObject, maxLevel);
+        UE_SDK::traverseUObjectForMembersEtc(pUObject, 0x4000, 0, maxLevel);
+    }
+    else {
+        printSDKUsage();
         return false;
     }
 
-
     return true;
-
-    return true;
-
 }
 
 
