@@ -19,6 +19,12 @@ public:
 
 namespace UE_SDK {
 
+    enum EType
+    {
+        ClassInstance,
+        StructProperty
+    };
+
     class UObject {
     public:
         uintptr_t vTable;
@@ -30,9 +36,14 @@ namespace UE_SDK {
         uintptr_t pClassOuter;
         //Own methods
         bool static isUObject(uintptr_t pTarget);
-        UObject from(UObject* pTarget);
+        EType type;
+        UObject static from(UObject* pTarget);
         bool findName();
         char asciiName[NAME_LENGTH] = NAME_EMPTY;
+    };
+
+    class StructProperty {
+    public:
     };
 
     class UProperty {

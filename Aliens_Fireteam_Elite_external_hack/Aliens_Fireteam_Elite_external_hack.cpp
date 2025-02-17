@@ -54,6 +54,7 @@ void printSDKUsage() {
     error("usage: hack.exe {sdk,hack}\n");
     printf("\thack.exe sdk print-names                             # Prints all GObjects names\n");
     printf("\thack.exe sdk object-info <address>  <max-levels>     # Prints info about a specified UOBject\n");
+    printf("\thack.exe sdk find-names  <name>                      # Find UOBjects that start with a specific string\n");
 }
 
 int main(int argc, char** argv)
@@ -119,6 +120,11 @@ LPVOID FNamePoolPointerchain[]{
 
 UINT8 FNamePoolPointerchainSize = 2;
 
+#include <bitset>
+std::bitset<32> getBits(uint32_t num) {
+    std::bitset<32> bits(num);
+    return bits;
+}
 
 bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
 
@@ -142,6 +148,8 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
 
     sdk.buildUObjectArray(500000);
     info("Initialized GOBjects with %u objects\n", sdk.pUObjectsSize);
+
+
 
     if (strncmp(argv[2], "print-names", 12) == 0) {
         info("Printing UOBject names from GOBjects\n");
@@ -168,6 +176,22 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
         uintptr_t pUObject = (uintptr_t)std::stoull(pUObjectArg, nullptr, 16);
         info("Object information for: 0x%p. Max Level: %u\n", pUObject, maxLevel);
         UE_SDK::traverseUObjectForMembersEtc(pUObject, 0x4000, 0, maxLevel);
+    }
+    else if (strncmp(argv[2], "find-names", 11) == 0) {
+        if (argc < 3 || strlen(argv[3]) == 0) {
+            printSDKUsage();
+            return WIN_ERROR;
+        }
+            info("[pointer] [string]\n");
+
+        for (int i = 0; i < sdk.pUObjectsSize; i++) {
+            UE_SDK::UObject obj = UE_SDK::UObject::from(sdk.pUObjects[i]);
+            if (strncmp(obj.asciiName, argv[3], strlen(argv[3])) == 0) {
+                info("[%p] [%s]\n", sdk.pUObjects[i], obj.asciiName);
+
+            }
+        }
+        return true;
     }
     else {
         printSDKUsage();

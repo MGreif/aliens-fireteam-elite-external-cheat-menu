@@ -9,7 +9,7 @@ namespace UE_SDK {
     bool UObject::findName() {
         pSdk->getFName(this->name, this->asciiName);
         if (strlen(this->asciiName) <= 1) {
-            ERROR_TRACE&& printf("[!] No name found...\n");
+            error_trace("UObject find name", "No name found...\n");
             return false;
         }
         return true;
@@ -17,34 +17,41 @@ namespace UE_SDK {
     bool UObject::isUObject(uintptr_t pTarget) {
         bool result = true;
         UObject* uObject = (UObject*)malloc(sizeof(UObject));
-        DEBUG_SDK&& printf("pTarget: %p, hProcess: %x, moduleBaseAddress: %p\n", pTarget, pSdk->mem->hProcess, (LPVOID)pSdk->mem->moduleBaseAddress);
-        if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uObject, sizeof(UObject), NULL)) {
-            ERROR_TRACE&& printf("[!][isUObject] Could not save UOBject (%p) to %p. Error: %u\n", pTarget, uObject, GetLastError());
-            free(uObject);
+        uObject->from((UObject*)pTarget);
+        UObject empty = { 0 };
+
+        if (memcmp(uObject, &empty,sizeof(UObject)) == 0) {
+            error_trace("isUObject", "Could not instantiate UObject\n");
             return false;
         }
 
         if (pSdk->mem->IsBadReadPtr((LPVOID)uObject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)uObject->vTable)) {
-            ERROR_TRACE&& printf("[!][isUObject] ClassPrivate (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uObject->pClassPrivate, uObject->vTable, GetLastError());
+            error_trace("isUObject", "ClassPrivate (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uObject->pClassPrivate, uObject->vTable, GetLastError());
             free(uObject);
             return false;
         }
-
-        result = uObject->findName();
-
 
         free(uObject);
         return result;
     }
     UObject UObject::from(UObject* pTarget) {
         UObject obj = pSdk->mem->readRemote(pTarget);
+        if (!obj.findName()) {
+            return UObject{0};
+        }
+
+        if (obj.flags == 0x30615788) {
+            obj.type = EType::StructProperty;
+        }
+
         return obj;
     }
+
 
     bool UProperty::findName() {
         pSdk->getFName(this->name, this->asciiName);
         if (strlen(this->asciiName) <= 1) {
-            ERROR_TRACE&& printf("[!] No name found...\n");
+            error_trace("UProperty find name", "No name found...\n");
             return false;
         }
 

@@ -49,7 +49,6 @@ public:
              error_trace("readRemote", "Could not read memory!");
             return NULL;
         }
-        printf("%p %p %p\n", address, buf, size);
 
         return buf;
     }
