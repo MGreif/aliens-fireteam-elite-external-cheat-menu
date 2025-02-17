@@ -53,5 +53,8 @@
     <ClInclude Include="hack\LoopThread.hpp">
       <Filter>Header Files\hack</Filter>
     </ClInclude>
+    <ClInclude Include="log.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
