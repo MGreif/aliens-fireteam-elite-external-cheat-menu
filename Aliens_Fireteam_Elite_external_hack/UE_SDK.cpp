@@ -4,16 +4,33 @@
 
 #define DEBUG_SDK false
 #define ERROR_TRACE false
+#define MAX_PROPERTIES 8924
+#define PROP_PREFIX_LENGTH 1024
 
+/// <summary>
+/// Unreal Engine Software Development Kit
+/// </summary>
 namespace UE_SDK {
+    /// <summary>
+    /// Populates the UObject instance with the found FNamePool name
+    /// </summary>
+    /// <returns>success boolean</returns>
     bool UObject::findName() {
-        pSdk->getFName(this->name, this->asciiName);
+        if (!pSdk->getFName(this->name, this->asciiName)) {
+            return false;
+        }
         if (strlen(this->asciiName) <= 1) {
             error_trace("UObject find name", "No name found...\n");
             return false;
         }
         return true;
     }
+
+    /// <summary>
+    /// Assertion function to validate if a UObject pointer is a valid UObject.
+    /// </summary>
+    /// <param name="pTarget">Target pointer</param>
+    /// <returns>Boolean if the pointer points to a valid UObject</returns>
     bool UObject::isUObject(uintptr_t pTarget) {
         bool result = true;
         debug("Getting UObject for %p\n", pTarget);
@@ -39,51 +56,61 @@ namespace UE_SDK {
         }
         return false;
     }
+
+    /// <summary>
+    /// Creates a local UObject copy populated with the FNamePool name for it.
+    /// </summary>
+    /// <param name="pTarget"></param>
+    /// <returns></returns>
     UObject UObject::from(UObject* pTarget) {
         UObject obj = pSdk->mem->readRemote(pTarget);
         if (!obj.findName()) {
             return UObject{0};
         }
 
-        if (obj.flags == 0x30615788) {
-            obj.type = EType::StructProperty;
-        }
-
         return obj;
     }
 
-
+    /// <summary>
+    /// Populates the UProperty instance with the found FNamePool name
+    /// </summary>
+    /// <returns></returns>
     bool UProperty::findName() {
-        pSdk->getFName(this->name, this->asciiName);
+        if (!pSdk->getFName(this->name, this->asciiName)) {
+            return false;
+        }
         if (strlen(this->asciiName) <= 1) {
             error_trace("UProperty find name", "No name found...\n");
             return false;
         }
-
-
-
         return true;
     }
+
+    /// <summary>
+    /// Assertion function to validate if a UProperty pointer is a valid property.
+    /// </summary>
+    /// <param name="pTarget">Target pointer</param>
+    /// <returns>Boolean if the pointer points to a valid UProperty</returns>
     bool UProperty::isUProperty(uintptr_t pTarget) {
         bool result = true;
         UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
         memset(uProperty, 0, sizeof(uProperty));
         if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)pTarget, uProperty, sizeof(UProperty), NULL)) {
-            ERROR_TRACE&& printf("[!][isUProperty] Could not save UProperty (%p) to %p. Error: %u\n", pTarget, uProperty, GetLastError());
+            error_trace("isUProperty", "Could not save UProperty (%p) to %p. Error: %u\n", pTarget, uProperty, GetLastError());
             free(uProperty);
             return false;
         }
 
-        DEBUG_SDK&& printf("NameIndex: %p\n", uProperty->name);
+        debug("NameIndex: %p\n", uProperty->name);
 
         if (pSdk->mem->IsBadReadPtr((LPVOID)uProperty->pOwner) || pSdk->mem->IsBadReadPtr((LPVOID)uProperty->vTable)) {
-            ERROR_TRACE&& printf("[!][isUProperty] pOwner (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uProperty->pOwner, uProperty->vTable, GetLastError());
+            error_trace("isUProperty", "pOwner (%p) or VTable (%p) is not a valid pointer. Error: %u\n", uProperty->pOwner, uProperty->vTable, GetLastError());
             free(uProperty);
             return false;
         }
 
         if (uProperty->pOwner == 0x0 && uProperty->vTable == 0x0 && uProperty->name == 0x0) {
-            ERROR_TRACE&& printf("[!][isUProperty] is empty\n");
+            error_trace("isUProperty", "is empty\n");
             return false;
         }
 
@@ -98,7 +125,25 @@ namespace UE_SDK {
         return result;
     }
 
+    /// <summary>
+    /// Checks if a UProperty is empty
+    /// </summary>
+    /// <returns>If the UProperty is empty</returns>
+    bool UProperty::isEmpty() {
+        UProperty empty = { 0 };
 
+        if (memcmp(this, &empty, sizeof(UProperty)) == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Uses the FNamePool to get the correct ASCII string for a nameIndex id.
+    /// </summary>
+    /// <param name="id">NameIndex id</param>
+    /// <param name="out">Output name string</param>
+    /// <returns>Success boolean</returns>
     BOOL UE_SDK::Remote_SDK::getFName(UINT32 id, char* out) {
 
         if (id == NULL) {
@@ -106,7 +151,7 @@ namespace UE_SDK {
             return false;
         }
 
-        if (id > 0xFFFFFFF) {
+        if (id >= 0xFFFFFF6) {
             error_trace("getFName", "NameIndex too big: %p!\n", id);
             return false;
         }
@@ -157,8 +202,9 @@ namespace UE_SDK {
         }
 
 
+        // Getting rid of often ocurring false positives
         if (strncmp(tempName, "y", 1) == 0) {
-            return true;
+            return false;
         }
 
         for (int i = 2; i < strlen(tempName); i++) {
@@ -168,7 +214,15 @@ namespace UE_SDK {
         }
 
         if (strlen((char*)tempName + skip) == 1) {
-            return true;
+            return false;
+        }
+
+        // Check for still invalid names
+        if (
+            ((tempName + skip)[0] > 0x7B || (tempName + skip)[0] < 0x2D) &&
+            ((tempName + skip)[1] > 0x7B || (tempName + skip)[1] < 0x2D)
+            ) {
+            return false;
         }
 
         memcpy(out, (char*)tempName + skip, strlen(tempName));
@@ -186,6 +240,13 @@ namespace UE_SDK {
     void UE_SDK::Remote_SDK::initMem(Mem* mem) {
         this->mem = mem;
     }
+
+    /// <summary>
+    /// Uses the FNamePool to get the ASCII name for UObjects
+    /// </summary>
+    /// <param name="uObject">pointer to UObject</param>
+    /// <param name="name">output string for the name</param>
+    /// <returns>FNamePool nameIndex value</returns>
     UINT64 UE_SDK::Remote_SDK::getFNameForUObject(uintptr_t uObject, char name[NAME_LENGTH]) {
         auto current = uObject;
         if (current < 0xFFFFFF || current > 0x7FF000000000) return 0;
@@ -200,6 +261,11 @@ namespace UE_SDK {
         return nameIndex;
     }
 
+    /// <summary>
+    /// Returns a heap allocated array of UObject pointers found in the Unreal Engine's GObject Array
+    /// </summary>
+    /// <param name="amount">Amount of pointers to search</param>
+    /// <returns>Heap allocated array of UObject pointers found in the Unreal Engine's GObject Array</returns>
     UObject** Remote_SDK::buildUObjectArray(size_t amount) {
         UObject** valids = (UObject**)calloc(amount, sizeof(UObject*));
         UObject** temp = (UObject**)calloc(amount, sizeof(UObject*));
@@ -221,18 +287,13 @@ namespace UE_SDK {
         return valids;
     }
 
-    bool UE_SDK::printAllFNames(HANDLE hProcess, LPVOID baseAddress) {
-        char name[NAME_LENGTH] = { 0 };
 
-        if (!pSdk->getFName((UINT64)0x00061299, name)) {
-            ERROR_TRACE&& printf("[!][Get-Name] Could not get id: %x", 0x00061299);
-        }
-
-
-
-        return true;
-    }
-
+    /// <summary>
+    /// Recursive function that gets the full name of a UObject by traversing up its inheritance chain printing the full inheritence.
+    /// </summary>
+    /// <param name="pUObject">Pointer to UObject</param>
+    /// <param name="out">Pointer to the output string (FULL_NAME_LENGTH size)</param>
+    /// <returns>Success boolean</returns>
     BOOL UE_SDK::Remote_SDK::getFullFName(UObject* pUObject, char* out) {
         char fullName[FULL_NAME_LENGTH] = { 0 };
         UINT16 namepointer = 0;
@@ -260,7 +321,19 @@ namespace UE_SDK {
         return true;
     }
 
-    bool UE_SDK::traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel) {
+    /// <summary>
+    /// Receives a ptr to a UObject. Stores this UObject locally and iterates over its content searching for valid pointers.
+    /// This function prints information about the found pointers.
+    /// It also works recursively.
+    /// </summary>
+    /// <param name="_pUObject">Target pointer</param>
+    /// <param name="size">Search size</param>
+    /// <param name="level">Recursion level</param>
+    /// <param name="maxLevel">Max recursion level</param>
+    /// <param name="onlyProperties">Whether to show only the found properties. This argument is deprecated
+    /// as is searches in the body of the UObject instance and not in the class definition like getPropertiesForUObject</param>
+    /// <returns>Success boolean</returns>
+    bool UE_SDK::traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel, bool onlyProperties) {
         if (level == maxLevel) return true;
         UObject* pUOBject = (UObject*)malloc(size);
         memset(pUOBject, 0, size);
@@ -285,8 +358,8 @@ namespace UE_SDK {
         debug("Name for UOBject %p: %s\n", _pUObject, UObjectName);
 
 
-        if (pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassPrivate) || pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassOuter)) {
-            error_trace("traverseUObjectForMembersEtc", "[!] pClassPrivate (%p) or pClassOuter (%p) is not a valid pointer ....\n", pUOBject->pClassPrivate, pUOBject->pClassOuter);
+        if (pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassPrivate)) {
+            error_trace("traverseUObjectForMembersEtc", "[!] pClassPrivate (%p) ....\n", pUOBject->pClassPrivate);
             return false;
         }
 
@@ -308,11 +381,13 @@ namespace UE_SDK {
 
             if (ptr > 0x7FF000000000) {
                 // Function
+                if (onlyProperties) continue;
 
                 for (int i = 0; i < level; i++) {
                     printf("-");
                 }
                 printf("- [%p] [0x%x] Function\n", ptr, i);
+                continue;
 
             }
             if (UProperty::isUProperty(ptr)) {
@@ -348,7 +423,6 @@ namespace UE_SDK {
             }
             if (UObject::isUObject(ptr)) {
                 // Object/Class
-
                 UObject ChildUOBject = UObject::from((UObject*)ptr);
 
 
@@ -365,7 +439,11 @@ namespace UE_SDK {
                 for (int i = 0; i < level; i++) {
                     printf("-");
                 }
-                printf("- [%p] [0x%x] [UObject] %s ~ %s\n", ptr, i, ChildUOBject.asciiName, fullname);
+
+                if (!onlyProperties) {
+                    printf("- [%p] [0x%x] [UObject] %s ~ %s\n", ptr, i, ChildUOBject.asciiName, fullname);
+                }
+
 
 
                 uintptr_t child = { 0 };
@@ -374,7 +452,7 @@ namespace UE_SDK {
                 //    ERROR_TRACE&& printf("Could not read child UOBject %p\n", (char*)_pUObject + i);
                 //    continue;
                 //}
-                traverseUObjectForMembersEtc(ptr, 0x1111, level + 1, maxLevel);
+                traverseUObjectForMembersEtc(ptr, 0x1111, level + 1, maxLevel, onlyProperties);
             }
 
         }
@@ -382,6 +460,166 @@ namespace UE_SDK {
         free(pUOBject);
     }
 
+    /// <summary>
+    /// This functions returns a pointer to a heap allocated array filled with locally stored/copied valid UProperties.
+    /// It iterates over the copied data from the target UObject pointer and searches for valid UProperty pointers.
+    /// </summary>
+    /// <param name="_pUObject">Target pointer</param>
+    /// <param name="size">Search size</param>
+    /// <returns>Pointer to heap allocated array of UProperties</returns>
+    UProperty* getPropertiesForUObject(uintptr_t _pUObject, size_t size) {
+        UProperty* properties = (UProperty*)calloc(MAX_PROPERTIES, sizeof(UProperty));
+        memset(properties, 0, MAX_PROPERTIES * sizeof(UProperty));
+        int propertycount = 0;
+
+        UObject* pUOBject = (UObject*)malloc(size);
+        memset(pUOBject, 0, size);
+
+        debug("Reading _pUOBject %p into pUOBject %p (heap)\n", _pUObject, pUOBject);
+
+
+        if (!ReadProcessMemory(pSdk->mem->hProcess, (LPCVOID)_pUObject, (LPVOID)pUOBject, size, NULL)) {
+            error_trace("printFullInfoAboutUObject", "Could not read memory (0x%p)\n", _pUObject);
+            return nullptr;
+        }
+        debug("Saved _pUOBject %p into pUOBject %p (heap)\n", _pUObject, pUOBject);
+        debug("Getting name for UOBject %p. Name index: %x\n", _pUObject, pUOBject->name);
+
+        // Assert that UObject points to a valid UObject
+        char UObjectName[NAME_LENGTH] = { 0 };
+        if (!pSdk->getFName(pUOBject->name, UObjectName)) {
+            error_trace("printFullInfoAboutUObject", "Could not get name for uobject (0x%p)!\n", _pUObject);
+            return nullptr;
+        }
+
+        debug("Name for UOBject %p: %s\n", _pUObject, UObjectName);
+
+
+        if (pSdk->mem->IsBadReadPtr((LPVOID)pUOBject->pClassPrivate)) {
+            error("[!] pClassPrivate (%p) or pClassOuter (%p) is not a valid pointer ....\n", pUOBject->pClassPrivate);
+            return nullptr;
+        }
+
+        for (int i = 0x20; i < size; i = i + 8) {
+
+            uintptr_t ptr = *(uintptr_t*)((char*)pUOBject + i);
+
+
+            if (pSdk->mem->IsBadReadPtr((LPVOID)ptr)) {
+                error_trace("printFullInfoAboutUObject", "Child QWORD (%p) (0x%x) is not a valid pointer ....\n", ptr, i);
+                continue;
+            };
+
+            if (UProperty::isUProperty(ptr)) {
+                UProperty* next = (UProperty*)ptr;
+
+                UProperty* uProperty = (UProperty*)malloc(sizeof(UProperty));
+                do {
+
+                    memset(uProperty, 0, sizeof(UProperty));
+
+                    if (!ReadProcessMemory(pSdk->mem->hProcess, (LPVOID)next, uProperty, sizeof(UProperty), NULL)) {
+                        error_trace("isUProperty", "Could not save UProperty(% p) to % p.Error: % u\n", next, uProperty, GetLastError());
+                        next = nullptr;
+                        continue;
+                    }
+
+                    uProperty->findName();
+
+                    debug("Saving uproperty (%s) to %p\n", uProperty->asciiName, properties + propertycount);
+                    if (propertycount > MAX_PROPERTIES) {
+                        error("Properties exhausted. Property count: %u. Max properties: %u\n", propertycount, MAX_PROPERTIES);
+                        break;
+                    }
+                    memcpy(properties + propertycount, uProperty, sizeof(UProperty));
+                    propertycount++;
+                    
+                    if (next == uProperty->pNext) {
+                        break;
+                    }
+                        
+                    next = uProperty->pNext;
+                } while (next != nullptr);
+                free(uProperty);
+
+
+            }
+        }
+        free(pUOBject);
+        return properties;
+    }
+
+
+
+    /// <summary>
+    /// Receives a pointer and size, locally stores the remote UObject to iterate over its 8bit alligned pointers (e.g. 0x00, 0x08 ...).
+    /// It iterates over all pointers and saves pointers pointing to valid UProperties. (returned by getPropertiesForUObject)
+    /// It also iterates over all pointers of the class definition (UClass) of this UObject.
+    /// </summary>
+    /// <param name="_pUObject">Target pointer</param>
+    /// <param name="size">Search size for this target</param>
+    /// <param name="level">current recursion level</param>
+    /// <param name="maxLevel">max recursion level</param>
+    /// <param name="prefix">recursion prefix for logging</param>
+    /// <returns>boolean</returns>
+    bool UE_SDK::getAllPropertiesForUObject(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel, char* prefix) {
+        if (level == maxLevel) return true;
+        char localPrefix[PROP_PREFIX_LENGTH] = { 0 };
+        int prefixLength = strlen(prefix);
+        if (level != 0) {
+            strncpy_s(localPrefix, PROP_PREFIX_LENGTH, prefix, PROP_PREFIX_LENGTH);
+        }
+        UObject baseObject = UObject::from((UObject*)_pUObject);
+        if (baseObject.isEmpty()) {
+            return true;
+        }
+        info("[%s] base class (%p)\n", baseObject.asciiName, _pUObject);
+        UProperty* properties = getPropertiesForUObject(_pUObject, size);
+        if (properties == nullptr) {
+            return false;
+        }
+        UObject classPrivate = UObject::from((UObject*)baseObject.pClassPrivate);
+
+        info("[%s] class private (%p)\n", classPrivate.asciiName, baseObject.pClassPrivate);
+        UProperty* propertiesOfInnerClass = getPropertiesForUObject(baseObject.pClassPrivate, size);
+        if (propertiesOfInnerClass == nullptr) {
+            return true;
+        }
+        info("Found %u Properties in the base object %p\n", getSizeOfArray(properties), _pUObject);
+        info("Found %u Properties in the classPrivate/innerClass object %p\n", getSizeOfArray(propertiesOfInnerClass), baseObject.pClassPrivate);
+        // todo merge class and classprivate properties together
+        for (int i = 0; i < MAX_PROPERTIES; i++) {
+            UProperty prop = propertiesOfInnerClass[i];
+            if (prop.isEmpty()) {
+                continue;
+            }
+            uintptr_t pPropCarrier = pSdk->mem->readRemote((uintptr_t*)((char*)_pUObject + prop.Internal_offset));
+
+            UObject propCarrier = UObject::from((UObject*)pPropCarrier);
+
+            char newPrefix2[PROP_PREFIX_LENGTH] = { 0 };
+            sprintf_s(newPrefix2, "%s / c:%s p:%s o:0x%x", localPrefix, classPrivate.asciiName, prop.asciiName, prop.Internal_offset);
+            info("[%s] %s (0x%x) (0x%p)\n", newPrefix2, prop.asciiName, prop.Internal_offset, _pUObject + prop.Internal_offset);
+
+            if (propCarrier.isEmpty()) {
+                continue;
+            }
+
+            getAllPropertiesForUObject(pPropCarrier, size, level + 1, maxLevel, newPrefix2);
+
+        }
+        free(properties);
+        free(propertiesOfInnerClass);
+        return true;
+    }
+
+
+    /// <summary>
+    /// Prints the FName for all UObjects of the given array.
+    /// </summary>
+    /// <param name="uObjects">Array containing UObject pointers</param>
+    /// <param name="size">Size of the array</param>
+    /// <returns>Success boolean</returns>
     bool UE_SDK::printFNameForUObjects(uintptr_t* uObjects, size_t size) {
 
         info("[index] [nameIndex] [pUObject] name\n");

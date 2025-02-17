@@ -1,17 +1,14 @@
-// Aliens_Fireteam_Elite_external_hack.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <windows.h>
 
 #include <TlHelp32.h>
-#include "UE_SDK.hpp"
 
 #include "Memory.h"
 #include <stdio.h>
 #include <sstream>
 #include "hack\LoopThread.hpp"
 #include "hack\HackLogic.hpp"
+#include "UE_SDK.hpp"
 
 #define PROCESS_NAME L"Endeavor-Win64-Shipping.exe"
 #define WIN_ERROR 1
@@ -52,9 +49,10 @@ void printUsage(bool bClearScreenBefore) {
 
 void printSDKUsage() {
     error("usage: hack.exe {sdk,hack}\n");
-    printf("\thack.exe sdk print-names                             # Prints all GObjects names\n");
-    printf("\thack.exe sdk object-info <address>  <max-levels>     # Prints info about a specified UOBject\n");
-    printf("\thack.exe sdk find-names  <name>                      # Find UOBjects that start with a specific string\n");
+    printf("\thack.exe sdk print-names                                      # Prints all GObjects names\n");
+    printf("\thack.exe sdk object-info <address>  <max-levels>              # Prints info about a specified UOBject\n");
+    printf("\thack.exe sdk find-names  <name>                               # Find UOBjects that start with a specific string\n");
+    printf("\thack.exe sdk get-properties  <uobject-address> <max-levels>   # Find UOBjects properties\n");
 }
 
 int main(int argc, char** argv)
@@ -175,7 +173,7 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
 
         uintptr_t pUObject = (uintptr_t)std::stoull(pUObjectArg, nullptr, 16);
         info("Object information for: 0x%p. Max Level: %u\n", pUObject, maxLevel);
-        UE_SDK::traverseUObjectForMembersEtc(pUObject, 0x4000, 0, maxLevel);
+        UE_SDK::traverseUObjectForMembersEtc(pUObject, 0x4000, 0, maxLevel, false);
     }
     else if (strncmp(argv[2], "find-names", 11) == 0) {
         if (argc < 3 || strlen(argv[3]) == 0) {
@@ -197,6 +195,32 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
                 info("[%p] [%s] [%s]\n", sdk.pUObjects[i], obj.asciiName, fullName);
 
             }
+        }
+        return true;
+    }
+    else if (strncmp(argv[2], "get-properties", 15) == 0) {
+        char* pUObjectArg = argv[3];
+        UINT8 maxLevel = 1;
+        if (argc < 3 || strlen(pUObjectArg) == 0) {
+            printSDKUsage();
+            return WIN_ERROR;
+        }
+        else if (argc > 4) {
+            if (strlen(argv[4]) == 0) {
+                printSDKUsage();
+                return WIN_ERROR;
+            }
+            maxLevel = atoi(argv[4]);
+            if (maxLevel == 0) {
+                printSDKUsage();
+                return WIN_ERROR;
+            }
+        }
+
+        uintptr_t pUObject = (uintptr_t)std::stoull(pUObjectArg, nullptr, 16);
+        info("Properties for: 0x%p. Max Level: %u\n", pUObject, maxLevel);
+        if (!UE_SDK::getAllPropertiesForUObject(pUObject, 0x1000, 0, maxLevel, (char*)"")) {
+            error("Could not print full info\n");
         }
         return true;
     }

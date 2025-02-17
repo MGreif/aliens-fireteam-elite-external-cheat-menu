@@ -8,7 +8,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>sdk find-names LocalP</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>sdk get-properties 1C3B44EA4C0 2</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

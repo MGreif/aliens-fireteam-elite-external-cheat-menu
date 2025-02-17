@@ -47,8 +47,17 @@ This will also enable me to write better checks/hacks for the game by seeing the
 The SDK:
 - scans for the GObjects and GNames(FNamePool in > v4)
 - Print all GOBjects
-- Print Details about GOBjects (Member classes and Properties with offsets)
-- Recursively print Details about GOBjects
+- Recursively prints Details about GOBjects (Member classes and Properties with offsets)
+- Recursively prints Details about GOBjects and properties (based on UClass definitions)
+
+## Usage
+
+```
+hack.exe sdk print-names                                      # Prints all GObjects names
+hack.exe sdk object-info <address>  <max-levels>              # Prints info about a specified UOBject
+hack.exe sdk find-names  <name>                               # Find UOBjects that start with a specific string
+hack.exe sdk get-properties  <uobject-address> <max-levels>   # Find UOBjects properties
+```
 
 ## TODO
 

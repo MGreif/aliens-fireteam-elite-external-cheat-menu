@@ -1,6 +1,6 @@
+#pragma once
 #ifndef UE_SDK_MG
 #define UE_SDK_MG
-#pragma once
 
 #include <stdio.h>
 #include <Windows.h>
@@ -17,6 +17,27 @@ public:
     char* chunks[1024]; // might be more
 };
 
+/// <summary>
+/// Small amateur algorithm to get the size of an array.
+/// </summary>
+/// <typeparam name="T">Type of the array items</typeparam>
+/// <param name="arr">Array</param>
+/// <returns>Size of the array</returns>
+template <typename T>
+UINT64 getSizeOfArray(T* arr) {
+    UINT64 count = 0;
+    T empty = { 0 };
+    do {
+        T* temp = arr + count;
+
+        if (memcmp(temp, &empty, sizeof(T)) == 0) {
+            return count;
+        }
+        count++;
+
+    } while (true);
+}
+
 
 namespace UE_SDK {
 
@@ -26,6 +47,9 @@ namespace UE_SDK {
         StructProperty
     };
 
+    /// <summary>
+    /// Base Class for UObjects
+    /// </summary>
     class UObject {
     public:
         uintptr_t vTable;
@@ -41,13 +65,16 @@ namespace UE_SDK {
         UObject static from(UObject* pTarget);
         bool isEmpty();
         bool findName();
-        char asciiName[NAME_LENGTH] = NAME_EMPTY;
+        char asciiName[NAME_LENGTH] = {0};
     };
 
     class StructProperty {
     public:
     };
 
+    /// <summary>
+    /// Base Class for UProperties. Also contains internal logic
+    /// </summary>
     class UProperty {
     public:
         uintptr_t vTable;
@@ -56,20 +83,26 @@ namespace UE_SDK {
         uintptr_t pad2;
         UINT64 flags;
         UINT64 name;
-        char pad3[0x1C];
+        char pad3[0x1C] = {0};
         UINT32 Internal_offset;
-        char pad4[0x8];
+        char pad4[0x8] = { 0 };
         UProperty* pNext;
         //Own methods
         UProperty(uintptr_t pTarget) {
             this->isUProperty(pTarget);
         }
+        UProperty() {
+
+        }
+        bool isEmpty();
         bool static isUProperty(uintptr_t pTarget);
         bool findName();
-        char asciiName[NAME_LENGTH] = NAME_EMPTY;
+        char asciiName[NAME_LENGTH] = { 0 };
     };
 
-
+    /// <summary>
+    /// Base class for SDK usage. Takes care of providing the correct memory adapter and storing global values like GObjectArray and FNamePool pointers
+    /// </summary>
     class Remote_SDK {
     public:
         uintptr_t pGObjectArray, pFNamePool = NULL;
@@ -88,8 +121,10 @@ namespace UE_SDK {
 
 	void init();
     bool printAllFNames(HANDLE hProcess, LPVOID baseAddress);
-    bool traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel);
+    bool traverseUObjectForMembersEtc(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel, bool onlyProperties);
     bool printFNameForUObjects(uintptr_t* uObjects, size_t size);
+    bool getAllPropertiesForUObject(uintptr_t _pUObject, size_t size, UINT8 level, UINT8 maxLevel, char* prefix);
+    UProperty* getPropertiesForUObject(uintptr_t _pUObject, size_t size);
 }
 
 
