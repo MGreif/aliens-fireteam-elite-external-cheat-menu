@@ -45,6 +45,7 @@ void printUsage(bool bClearScreenBefore) {
     printf("[In the hub-world]\n");
     printf("4: Set all consumables to 999\n");
     printf("0: Exit\n\n\n");
+    fflush(stdout);
 }
 
 void printSDKUsage() {
@@ -144,7 +145,7 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
     UE_SDK::Remote_SDK sdk = UE_SDK::Remote_SDK(pGObjectsArray, pFnamePool);
     sdk.initMem(mem);
 
-    sdk.buildUObjectArray(1000000);
+    sdk.buildUObjectArray(100000);
     info("Initialized GOBjects with %u objects\n", sdk.pUObjectsSize);
 
 
@@ -228,6 +229,7 @@ bool sdk(HANDLE hProcess, LPVOID baseAddress, Mem *mem, int argc, char** argv) {
         printSDKUsage();
         return false;
     }
+    info("Exiting...\n");
 
     return true;
 }

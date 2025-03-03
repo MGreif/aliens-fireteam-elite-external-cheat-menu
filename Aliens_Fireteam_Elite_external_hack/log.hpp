@@ -15,6 +15,7 @@ static constexpr void log(const char* type, const char* color, const char* s, Ar
     printf("%s[", color);
     printf("%s]%s ", type, RESET_COLOR);
     printf(s, a...);
+    fflush(stdout);
 }
 template <typename ...Args> static constexpr void error_trace(const char* scope, const char* s, Args ...a) { 
 #ifdef _DEBUG_ERRORS

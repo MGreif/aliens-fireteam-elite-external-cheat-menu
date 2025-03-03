@@ -121,9 +121,10 @@ bool Mem::IsBadReadPtr(HANDLE hProcess, LPVOID p)
         bool b = !(mbi.Protect & mask);
         // check the page is not a guard page
         if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) b = true;
-
         return b;
     }
+    debug("[IsBadReadPtr] Could not VirtualQueryEx: %p\n", p);
+
     return true;
 }
 

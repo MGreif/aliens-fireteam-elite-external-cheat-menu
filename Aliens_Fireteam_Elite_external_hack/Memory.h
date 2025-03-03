@@ -75,7 +75,7 @@ public:
         DWORD oldProtect;
 
         if (Mem::IsBadReadPtr(hProcess, address)) {
-       //     printf("[!] %p is a bad pointer!\n", address);
+            printf("[!] %p is a bad pointer!\n", address);
             return NULL;
         }
 
